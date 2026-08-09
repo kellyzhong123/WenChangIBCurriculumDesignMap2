@@ -1,0 +1,1943 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Thinking Cards 國際教育課程設計數位工具箱</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#2563eb',
+                            600: '#1d4ed8',
+                            700: '#1e40af',
+                        },
+                        amber: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', 'Noto Sans TC', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .tab-btn.active {
+            border-bottom: 3px solid #2563eb;
+            color: #2563eb;
+            font-weight: 700;
+            background-color: #ffffff;
+        }
+        .sticky-note {
+            background-color: #fef08a;
+            box-shadow: 2px 4px 10px rgba(0,0,0,0.08);
+            transition: all 0.2s ease;
+        }
+        .sticky-note:hover {
+            transform: translateY(-2px);
+            box-shadow: 4px 8px 15px rgba(0,0,0,0.12);
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background: white;
+                color: black;
+            }
+            .print-page {
+                page-break-after: always;
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 no-print shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xl shadow-md">
+                        🌍
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold text-slate-800 leading-tight">Global Thinking Cards</h1>
+                        <p class="text-xs text-slate-500 font-medium">國際教育課程設計數位工具箱</p>
+                    </div>
+                </div>
+
+                <!-- Global Action Buttons -->
+                <div class="flex items-center gap-2">
+                    <button onclick="saveToLocalStorage()" class="px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center gap-1.5 transition" title="內容將儲存於您的瀏覽器本機快取中，無須登入即可隨時恢復">
+                        <i data-lucide="save" class="w-4 h-4"></i>
+                        <span>暫存內容</span>
+                    </button>
+                    <button onclick="exportToWord()" class="px-3 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center gap-1.5 shadow-sm transition">
+                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                        <span>匯出 Word (.doc)</span>
+                    </button>
+                    <button onclick="printPDF()" class="px-3 py-2 text-xs font-semibold text-slate-700 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg flex items-center gap-1.5 transition">
+                        <i data-lucide="printer" class="w-4 h-4"></i>
+                        <span>列印 / PDF</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Navigation Menu -->
+            <div class="flex border-t border-slate-100 overflow-x-auto no-scrollbar">
+                <button onclick="switchTab('part1')" id="tab-part1" class="tab-btn active px-5 py-3 text-sm font-medium text-slate-600 whitespace-nowrap flex items-center gap-2 border-b-2 border-transparent">
+                    <i data-lucide="book-open" class="w-4 h-4"></i> PART 1: 建立共同語言
+                </button>
+                <button onclick="switchTab('part2')" id="tab-part2" class="tab-btn px-5 py-3 text-sm font-medium text-slate-600 whitespace-nowrap flex items-center gap-2 border-b-2 border-transparent">
+                    <i data-lucide="layers" class="w-4 h-4"></i> PART 2: 12 思考卡探索與自訂
+                </button>
+                <button onclick="switchTab('part3')" id="tab-part3" class="tab-btn px-5 py-3 text-sm font-medium text-slate-600 whitespace-nowrap flex items-center gap-2 border-b-2 border-transparent">
+                    <i data-lucide="layout" class="w-4 h-4"></i> PART 3: A3 課程設計畫布
+                </button>
+                <button onclick="switchTab('part4')" id="tab-part4" class="tab-btn px-5 py-3 text-sm font-medium text-slate-600 whitespace-nowrap flex items-center gap-2 border-b-2 border-transparent">
+                    <i data-lucide="folder-check" class="w-4 h-4"></i> PART 4: 跨領域案例
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Custom Toast Notification Box -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl z-50 hidden transition-all flex items-center gap-2">
+        <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400"></i>
+        <span id="toast-msg" class="text-sm">訊息通知</span>
+    </div>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+        <!-- PART 1: Building Common Language -->
+        <section id="sec-part1" class="space-y-8">
+            <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                        <i data-lucide="compass" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800">PART 1: Building Common Language 建立共同語言</h2>
+                        <p class="text-sm text-slate-500">概念為本（Concept-Based Learning）課程設計視覺化逆向思維架構</p>
+                    </div>
+                </div>
+
+                <!-- Seven Core Elements Progression Flow -->
+                <div class="mt-8 bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i data-lucide="git-commit" class="w-5 h-5 text-blue-600"></i>
+                        課程設計七大核心元素遞進流程圖 (Reverse Design Flow)
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-7 gap-3 text-center text-xs">
+                        <div class="bg-white p-4 rounded-xl border border-blue-100 shadow-sm flex flex-col justify-between">
+                            <span class="text-xl mb-1">🔍</span>
+                            <span class="font-bold text-blue-600 text-sm">1. Topic</span>
+                            <span class="text-slate-500 mt-1">單元主題內容</span>
+                        </div>
+                        <div class="hidden md:flex items-center justify-center text-slate-300 font-bold">➔</div>
+                        <div class="bg-white p-4 rounded-xl border border-blue-100 shadow-sm flex flex-col justify-between">
+                            <span class="text-xl mb-1">🔑</span>
+                            <span class="font-bold text-blue-600 text-sm">2. Key Concept</span>
+                            <span class="text-slate-500 mt-1">跨時空核心概念</span>
+                        </div>
+                        <div class="hidden md:flex items-center justify-center text-slate-300 font-bold">➔</div>
+                        <div class="bg-white p-4 rounded-xl border border-blue-100 shadow-sm flex flex-col justify-between">
+                            <span class="text-xl mb-1">💡</span>
+                            <span class="font-bold text-blue-600 text-sm">3. Big Idea</span>
+                            <span class="text-slate-500 mt-1">學生帶走的大概念</span>
+                        </div>
+                        <div class="hidden md:flex items-center justify-center text-slate-300 font-bold">➔</div>
+                        <div class="bg-white p-4 rounded-xl border border-blue-100 shadow-sm flex flex-col justify-between">
+                            <span class="text-xl mb-1">❓</span>
+                            <span class="font-bold text-blue-600 text-sm">4. Inquiry</span>
+                            <span class="text-slate-500 mt-1">引發思索的問題</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-3 text-center text-xs mt-3">
+                        <div class="bg-white p-4 rounded-xl border border-blue-100 shadow-sm flex flex-col justify-between md:col-start-2">
+                            <span class="text-xl mb-1">🏃</span>
+                            <span class="font-bold text-blue-600 text-sm">5. Learning</span>
+                            <span class="text-slate-500 mt-1">跨領域體驗活動</span>
+                        </div>
+                        <div class="hidden md:flex items-center justify-center text-slate-300 font-bold">➔</div>
+                        <div class="bg-white p-4 rounded-xl border border-blue-100 shadow-sm flex flex-col justify-between">
+                            <span class="text-xl mb-1">🎯</span>
+                            <span class="font-bold text-blue-600 text-sm">6. Performance Task</span>
+                            <span class="text-slate-500 mt-1">真實情境成果展現</span>
+                        </div>
+                        <div class="hidden md:flex items-center justify-center text-slate-300 font-bold">➔</div>
+                        <div class="bg-white p-4 rounded-xl border border-blue-100 shadow-sm flex flex-col justify-between">
+                            <span class="text-xl mb-1">📊</span>
+                            <span class="font-bold text-blue-600 text-sm">7. Evidence</span>
+                            <span class="text-slate-500 mt-1">學習評量與證明</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Topic vs Big Idea Comparison Table -->
+                <div class="mt-8">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i data-lucide="arrow-left-right" class="w-5 h-5 text-blue-600"></i>
+                        「傳統主題 (Topic)」與「概念導向大觀念 (Big Idea)」對照表
+                    </h3>
+                    <div class="overflow-x-auto rounded-xl border border-slate-200">
+                        <table class="w-full text-left text-sm text-slate-600">
+                            <thead class="bg-slate-100 text-slate-700 font-bold text-xs uppercase">
+                                <tr>
+                                    <th class="p-4">領域</th>
+                                    <th class="p-4 bg-slate-200/50">傳統主題導向 (Topic-Based)</th>
+                                    <th class="p-4 bg-blue-50 text-blue-700">概念導向大觀念 (Concept-Based Big Idea)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 bg-white">
+                                <tr>
+                                    <td class="p-4 font-semibold text-slate-800">自然與生活科技</td>
+                                    <td class="p-4 text-slate-500">水循環與天氣變化</td>
+                                    <td class="p-4 font-medium text-slate-800 bg-blue-50/30">系統中各要素相互依存，微小的改變會引發環境整體的顯著效應。(Interdependence/Change)</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4 font-semibold text-slate-800">英語文</td>
+                                    <td class="p-4 text-slate-500">Food & Healthy Eating (食物與健康)</td>
+                                    <td class="p-4 font-medium text-slate-800 bg-blue-50/30">個人的日常飲食選擇不僅影響自我健康，也承擔著全球食物資源分配的責任。(Responsibility)</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4 font-semibold text-slate-800">社會領域</td>
+                                    <td class="p-4 text-slate-500">家鄉的交通建設</td>
+                                    <td class="p-4 font-medium text-slate-800 bg-blue-50/30">不同的利益相關者對同一建設擁有不同觀點，公共決策需在多元需求中尋找平衡。(Perspective)</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4 font-semibold text-slate-800">藝術領域</td>
+                                    <td class="p-4 text-slate-500">認識台灣原住民圖騰</td>
+                                    <td class="p-4 font-medium text-slate-800 bg-blue-50/30">藝術符號是文化價值的具象載體，展現群體對自我身份的認同與傳承。(Culture/Identity)</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4 font-semibold text-slate-800">資訊科技</td>
+                                    <td class="p-4 text-slate-500">網路安全與社群媒體</td>
+                                    <td class="p-4 font-medium text-slate-800 bg-blue-50/30">數位世界給予表達自由，同時要求個人為自己在虛擬空間中的行為與足跡負起道德責任。(Responsibility/Identity)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 2: Global Thinking Cards Interactivity -->
+        <section id="sec-part2" class="space-y-6 hidden">
+            <!-- Card Selector Grid -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">請選擇要探索與編輯的 Concept (核心概念)</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5" id="card-selector">
+                    <!-- Concept Buttons dynamically populated -->
+                </div>
+            </div>
+
+            <!-- Active Card Container -->
+            <div id="card-display" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <!-- Page Navigation Header inside Card -->
+                <div class="bg-slate-900 text-white p-6 flex flex-col md:flex-row justify-between md:items-center gap-4">
+                    <div class="flex items-center gap-4">
+                        <span id="active-card-icon" class="text-4xl p-2 bg-slate-800 rounded-xl">#1</span>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h2 id="active-card-title" class="text-2xl font-bold">Responsibility 責任</h2>
+                                <span id="active-card-tag" class="text-xs bg-blue-500/30 text-blue-300 border border-blue-400/30 px-2.5 py-0.5 rounded-full font-semibold">Concept #1</span>
+                            </div>
+                            <p id="active-card-sub" class="text-xs text-slate-400 mt-1">對自己的行為、他人與環境所承擔的義務與後果</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-1.5 bg-slate-800 p-1.5 rounded-xl text-xs overflow-x-auto">
+                        <button onclick="switchCardSubTab(1)" id="subtab-1" class="px-3 py-1.5 rounded-lg bg-blue-600 font-semibold text-white">Page 1 Snapshot</button>
+                        <button onclick="switchCardSubTab(2)" id="subtab-2" class="px-3 py-1.5 rounded-lg hover:bg-slate-700 text-slate-300">Page 2 Big Ideas</button>
+                        <button onclick="switchCardSubTab(3)" id="subtab-3" class="px-3 py-1.5 rounded-lg hover:bg-slate-700 text-slate-300">Page 3 Questions</button>
+                        <button onclick="switchCardSubTab(4)" id="subtab-4" class="px-3 py-1.5 rounded-lg hover:bg-slate-700 text-slate-300">Page 4 Cross-Curricular</button>
+                        <button onclick="switchCardSubTab(5)" id="subtab-5" class="px-3 py-1.5 rounded-lg hover:bg-slate-700 text-slate-300">Page 5 Tasks, Assessment & SDGs</button>
+                        <button onclick="switchCardSubTab(6)" id="subtab-6" class="px-3 py-1.5 rounded-lg hover:bg-slate-700 text-slate-300">Page 6 Reflection</button>
+                    </div>
+                </div>
+
+                <div class="p-6 sm:p-8">
+                    <!-- Page 1: Concept Snapshot -->
+                    <div id="card-page-1" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-blue-50/60 p-5 rounded-2xl border border-blue-100">
+                                <h4 class="text-sm font-bold text-blue-800 flex items-center gap-2 mb-2">
+                                    <i data-lucide="quote" class="w-4 h-4"></i> 一句話定義 (Single Sentence Definition)
+                                </h4>
+                                <p id="p1-def" class="text-slate-700 text-sm font-medium leading-relaxed">...</p>
+                            </div>
+                            <div class="bg-emerald-50/60 p-5 rounded-2xl border border-emerald-100">
+                                <h4 class="text-sm font-bold text-emerald-800 flex items-center gap-2 mb-2">
+                                    <i data-lucide="smile" class="w-4 h-4"></i> 學生版說法 (Student Formulation)
+                                </h4>
+                                <p id="p1-student" class="text-slate-700 text-sm font-medium leading-relaxed">...</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                            <h4 class="text-sm font-bold text-slate-800 flex items-center gap-2 mb-2">
+                                <i data-lucide="lightbulb" class="w-4 h-4 text-amber-500"></i> 給老師的補充說明 (Pedagogical Insight)
+                            </h4>
+                            <p id="p1-teacher" class="text-slate-600 text-sm leading-relaxed">...</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-amber-50/50 p-5 rounded-2xl border border-amber-100">
+                                <h4 class="text-sm font-bold text-amber-900 flex items-center gap-2 mb-2">
+                                    <i data-lucide="sun" class="w-4 h-4 text-amber-600"></i> 生活例子 (Daily Life Examples)
+                                </h4>
+                                <ul id="p1-life" class="list-disc list-inside text-sm text-slate-700 space-y-1"></ul>
+                            </div>
+                            <div class="bg-rose-50/50 p-5 rounded-2xl border border-rose-100">
+                                <h4 class="text-sm font-bold text-rose-900 flex items-center gap-2 mb-2">
+                                    <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-600"></i> 容易混淆概念與常見迷思 (Misconceptions)
+                                </h4>
+                                <p id="p1-misconception" class="text-slate-700 text-sm leading-relaxed"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Page 2: Big Idea Sentence Bank -->
+                    <div id="card-page-2" class="space-y-6 hidden">
+                        <div class="flex justify-between items-center bg-blue-50 p-4 rounded-xl border border-blue-100">
+                            <div>
+                                <h4 class="font-bold text-blue-900 text-sm">💡 大概念句子庫 (Big Idea Sentence Bank)</h4>
+                                <p class="text-xs text-blue-700">勾選適合教學單元的大概念，點擊按鈕一鍵帶入 PART 3 畫布步驟 3！</p>
+                            </div>
+                            <button onclick="exportSelectedBigIdeasToCanvas()" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-sm">
+                                <i data-lucide="arrow-right-circle" class="w-4 h-4"></i> 帶入 PART 3 畫布 (步驟 3)
+                            </button>
+                        </div>
+
+                        <div class="space-y-6" id="p2-bigideas-container">
+                            <!-- Low, Mid, High grade sentences populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Page 3: Inquiry Question Bank -->
+                    <div id="card-page-3" class="space-y-6 hidden">
+                        <div class="flex justify-between items-center bg-blue-50 p-4 rounded-xl border border-blue-100">
+                            <div>
+                                <h4 class="font-bold text-blue-900 text-sm">❓ 分齡探究問題庫 (Inquiry Question Bank)</h4>
+                                <p class="text-xs text-blue-700">涵蓋低、中、高年級的事實性 (Factual)、概念性 (Conceptual) 與辯論性 (Debatable) 提問。</p>
+                            </div>
+                            <button onclick="exportSelectedQuestionsToCanvas()" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-sm">
+                                <i data-lucide="arrow-right-circle" class="w-4 h-4"></i> 帶入 PART 3 畫布 (步驟 4)
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="p3-questions-container">
+                            <!-- Questions populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Page 4: Cross-Curricular Directions -->
+                    <div id="card-page-4" class="space-y-6 hidden">
+                        <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-4">
+                            <h4 class="font-bold text-blue-900 text-sm">🌐 跨領域課程靈感 (Cross-Curricular Ideas)</h4>
+                            <p class="text-xs text-blue-700">提供英語、國語、社會、自然、藝術、資訊、體育與健康、綜合/生活等領域之單元脈絡方向。</p>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="p4-curricular-container">
+                            <!-- Curricular ideas populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Page 5: Performance Tasks, Assessment & SDGs -->
+                    <div id="card-page-5" class="space-y-8 hidden">
+                        <!-- Tasks Section -->
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center bg-blue-50 p-4 rounded-xl border border-blue-100">
+                                <div>
+                                    <h4 class="font-bold text-blue-900 text-sm">🎯 跨領域實作任務選項 (Performance Tasks)</h4>
+                                    <p class="text-xs text-blue-700">勾選適合貴班或跨領域團隊之成果型態，帶入畫布「步驟 6」！</p>
+                                </div>
+                                <button onclick="exportSelectedTasksToCanvas()" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-sm whitespace-nowrap">
+                                    <i data-lucide="arrow-right-circle" class="w-4 h-4"></i> 帶入 PART 3 畫布 (步驟 6)
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" id="p5-tasks-container">
+                                <!-- Performance tasks option grid grouped by domain -->
+                            </div>
+
+                            <!-- Custom Task Input Box -->
+                            <div class="p-4 bg-amber-50/80 border border-amber-200 rounded-xl space-y-2">
+                                <label class="text-xs font-bold text-amber-900 flex items-center gap-1.5">
+                                    <i data-lucide="edit-3" class="w-4 h-4 text-amber-600"></i> 其他自訂實作任務 (Custom Performance Task):
+                                </label>
+                                <input type="text" id="custom-task-input" class="w-full p-2.5 text-xs bg-white border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none" placeholder="例：跨國筆友文化繪本創作、校園植物節能感測微型裝置展示...">
+                            </div>
+                        </div>
+
+                        <!-- Multi-Assessment Section -->
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center bg-emerald-50 p-4 rounded-xl border border-emerald-100">
+                                <div>
+                                    <h4 class="font-bold text-emerald-900 text-sm">📊 多元評量建議與量表 (Assessment Strategies)</h4>
+                                    <p class="text-xs text-emerald-700">包含形成性評量、總結性評量規準與自評互評策略，可勾選帶入畫布「步驟 7」！</p>
+                                </div>
+                                <button onclick="exportSelectedAssessmentToCanvas()" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-sm whitespace-nowrap">
+                                    <i data-lucide="arrow-right-circle" class="w-4 h-4"></i> 帶入 PART 3 畫布 (步驟 7)
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="p5-assessments-container">
+                                <!-- Assessment strategies populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- SDGs Section -->
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center bg-purple-50 p-4 rounded-xl border border-purple-100">
+                                <div>
+                                    <h4 class="font-bold text-purple-900 text-sm">🌍 永續發展目標建議 (SDGs Recommendations)</h4>
+                                    <p class="text-xs text-purple-700">本核心概念最契合之聯合國 SDGs 永續發展目標與推薦理由，可勾選帶入畫布！</p>
+                                </div>
+                                <button onclick="exportSelectedSDGsToCanvas()" class="px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-sm whitespace-nowrap">
+                                    <i data-lucide="arrow-right-circle" class="w-4 h-4"></i> 帶入 PART 3 畫布 (步驟 2)
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="p5-sdgs-container">
+                                <!-- SDGs recommendation populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Page 6: Teacher Reflection -->
+                    <div id="card-page-6" class="space-y-6 hidden">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-slate-800 text-sm">📝 教師反思與學習證據 (Teacher Reflection)</h4>
+                            <button onclick="exportReflectionToCanvas()" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-sm">
+                                <i data-lucide="arrow-right-circle" class="w-4 h-4"></i> 同步至 PART 3 畫布 (步驟 8 & 9)
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-2">
+                                <label class="text-xs font-bold text-slate-700">學生理解證據 (Student Evidence of Understanding):</label>
+                                <textarea id="p6-evidence" class="w-full h-28 p-3 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="記錄學生在課堂討論或學習單中展現出『懂了』的具體言行..."></textarea>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-xs font-bold text-slate-700">學生作品亮點 (Highlights of Student Work):</label>
+                                <textarea id="p6-highlights" class="w-full h-28 p-3 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="描述學生作品亮點，例如：海報設計中的獨到觀點、Podcast口語表達..."></textarea>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-xs font-bold text-slate-700">教師自我提問反思 (Teacher Self Reflection):</label>
+                                <textarea id="p6-teacher-ref" class="w-full h-28 p-3 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="哪些提問最引發討論？哪些學生感興趣？哪些地方需要提供額外鷹架？"></textarea>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-xs font-bold text-slate-700">下次課程調整方向 (Next Time I Will...):</label>
+                                <textarea id="p6-next" class="w-full h-28 p-3 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="下次教學欲修正或調整的部分..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 3: Curriculum Design Canvas -->
+        <section id="sec-part3" class="space-y-6 hidden">
+            <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-100">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800">A3 Interactive Canvas</span>
+                            <h2 class="text-2xl font-bold text-slate-800">PART 3: 課程設計畫布 (Curriculum Design Canvas)</h2>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">適合教師社群共同發想、點擊便利貼自由填寫，亦可從 PART 2 或 PART 4 帶入內容！</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                        <div>
+                            <label class="block text-slate-500 font-semibold mb-1">單元主題名稱</label>
+                            <input type="text" id="canvas-unit-title" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="例：減塑生活家">
+                        </div>
+                        <div>
+                            <label class="block text-slate-500 font-semibold mb-1">適用年級/領域</label>
+                            <input type="text" id="canvas-grade-domain" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="例：五年級 / 跨領域">
+                        </div>
+                        <div>
+                            <label class="block text-slate-500 font-semibold mb-1">設計教師名稱</label>
+                            <input type="text" id="canvas-teacher-name" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="例：鍾靜宜 老師">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive 9-step Grid Canvas -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Step 1 -->
+                    <div class="sticky-note p-4 rounded-2xl border border-yellow-300/80 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-amber-900 bg-yellow-200 px-2 py-0.5 rounded-md">步驟 1</span>
+                            <span class="text-xs font-bold text-amber-800">Topic 主題</span>
+                        </div>
+                        <textarea id="canvas-c1" class="w-full h-28 bg-transparent text-xs text-slate-800 focus:outline-none resize-none font-medium" placeholder="我們這學期要教的具體主題內容是什麼？..."></textarea>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="sticky-note p-4 rounded-2xl border border-yellow-300/80 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-amber-900 bg-yellow-200 px-2 py-0.5 rounded-md">步驟 2</span>
+                            <span class="text-xs font-bold text-amber-800">Key Concept 核心概念</span>
+                        </div>
+                        <textarea id="canvas-c2" class="w-full h-28 bg-transparent text-xs text-slate-800 focus:outline-none resize-none font-medium" placeholder="選定的核心概念 (如：Responsibility, Sustainability)..."></textarea>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="sticky-note p-4 rounded-2xl border border-yellow-300/80 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-amber-900 bg-yellow-200 px-2 py-0.5 rounded-md">步驟 3</span>
+                            <span class="text-xs font-bold text-amber-800">Big Idea 大概念</span>
+                        </div>
+                        <textarea id="canvas-c3" class="w-full h-28 bg-transparent text-xs text-slate-800 focus:outline-none resize-none font-medium" placeholder="寫下一句希望學生十年後還記得的人生道理..."></textarea>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="sticky-note p-4 rounded-2xl border border-yellow-300/80 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-amber-900 bg-yellow-200 px-2 py-0.5 rounded-md">步驟 4</span>
+                            <span class="text-xs font-bold text-amber-800">Inquiry Questions 探究問題</span>
+                        </div>
+                        <textarea id="canvas-c4" class="w-full h-28 bg-transparent text-xs text-slate-800 focus:outline-none resize-none font-medium" placeholder="列出引發思索的事實、概念、辯論性提問..."></textarea>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div class="sticky-note p-4 rounded-2xl border border-yellow-300/80 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-amber-900 bg-yellow-200 px-2 py-0.5 rounded-md">步驟 5</span>
+                            <span class="text-xs font-bold text-amber-800">Learning Experiences 學習體驗</span>
+                        </div>
+                        <textarea id="canvas-c5" class="w-full h-28 bg-transparent text-xs text-slate-800 focus:outline-none resize-none font-medium" placeholder="跨領域教學活動規劃與引導脈絡..."></textarea>
+                    </div>
+
+                    <!-- Step 6 -->
+                    <div class="sticky-note p-4 rounded-2xl border border-yellow-300/80 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-amber-900 bg-yellow-200 px-2 py-0.5 rounded-md">步驟 6</span>
+                            <span class="text-xs font-bold text-amber-800">Performance Task 實作任務</span>
+                        </div>
+                        <textarea id="canvas-c6" class="w-full h-28 bg-transparent text-xs text-slate-800 focus:outline-none resize-none font-medium" placeholder="學生最終成果展現方式 (Podcast, 展覽, 倡議行動)..."></textarea>
+                    </div>
+
+                    <!-- Step 7 -->
+                    <div class="sticky-note p-4 rounded-2xl border border-yellow-300/80 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-amber-900 bg-yellow-200 px-2 py-0.5 rounded-md">步驟 7</span>
+                            <span class="text-xs font-bold text-amber-800">Assessment 評量</span>
+                        </div>
+                        <textarea id="canvas-c7" class="w-full h-28 bg-transparent text-xs text-slate-800 focus:outline-none resize-none font-medium" placeholder="評量規準 (Rubric) 與多元評量方式..."></textarea>
+                    </div>
+
+                    <!-- Step 8 -->
+                    <div class="sticky-note p-4 rounded-2xl border border-yellow-300/80 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-amber-900 bg-yellow-200 px-2 py-0.5 rounded-md">步驟 8</span>
+                            <span class="text-xs font-bold text-amber-800">Student Evidence 學習證據</span>
+                        </div>
+                        <textarea id="canvas-c8" class="w-full h-28 bg-transparent text-xs text-slate-800 focus:outline-none resize-none font-medium" placeholder="收集的探究紀錄、學習單、作品、照片證據..."></textarea>
+                    </div>
+
+                    <!-- Step 9 -->
+                    <div class="sticky-note p-4 rounded-2xl border border-yellow-300/80 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-amber-900 bg-yellow-200 px-2 py-0.5 rounded-md">步驟 9</span>
+                            <span class="text-xs font-bold text-amber-800">Reflection 教師反思</span>
+                        </div>
+                        <textarea id="canvas-c9" class="w-full h-28 bg-transparent text-xs text-slate-800 focus:outline-none resize-none font-medium" placeholder="期末教學反思與未來優化修正點..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 4: School Examples -->
+        <section id="sec-part4" class="space-y-6 hidden">
+            <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800">PART 4: 跨領域案例 (School Examples)</h2>
+                        <p class="text-xs text-slate-500 mt-1">包含英語、社會、藝術、資訊、體育等領域在三年級、五年級與六年級之完整課程範例</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="exemplars-container">
+                    <!-- Exemplar cards rendered dynamically -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-8 px-4 border-t border-slate-800 mt-auto no-print">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
+            <div class="flex items-center gap-2">
+                <span class="text-base">🌍</span>
+                <span class="font-bold text-slate-200">Global Thinking Cards 國際教育課程設計數位工具箱</span>
+            </div>
+            <div class="text-slate-400">
+                臺北市文昌國民小學 鍾靜宜老師 製作
+            </div>
+            <div class="text-slate-500">
+                Inspired by PYP Concept-Based Learning & UbD Framework
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let currentCardId = 1;
+
+        // Toast Notification System
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            if (toast && toastMsg) {
+                toastMsg.innerText = msg;
+                toast.classList.remove('hidden');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 3000);
+            }
+        }
+
+        // Tab Navigation Switcher
+        function switchTab(tabId) {
+            ['part1', 'part2', 'part3', 'part4'].forEach(t => {
+                const sec = document.getElementById(`sec-${t}`);
+                const btn = document.getElementById(`tab-${t}`);
+                if (sec) sec.classList.add('hidden');
+                if (btn) btn.classList.remove('active');
+            });
+
+            const activeSec = document.getElementById(`sec-${tabId}`);
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            if (activeSec) activeSec.classList.remove('hidden');
+            if (activeBtn) activeBtn.classList.add('active');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Card Subtab Switcher
+        function switchCardSubTab(pageNum) {
+            for (let i = 1; i <= 6; i++) {
+                const page = document.getElementById(`card-page-${i}`);
+                const subtab = document.getElementById(`subtab-${i}`);
+                if (page) page.classList.add('hidden');
+                if (subtab) {
+                    subtab.classList.remove('bg-blue-600', 'text-white', 'font-semibold');
+                    subtab.classList.add('hover:bg-slate-700', 'text-slate-300');
+                }
+            }
+
+            const targetPage = document.getElementById(`card-page-${pageNum}`);
+            const targetSubtab = document.getElementById(`subtab-${pageNum}`);
+            if (targetPage) targetPage.classList.remove('hidden');
+            if (targetSubtab) {
+                targetSubtab.classList.remove('hover:bg-slate-700', 'text-slate-300');
+                targetSubtab.classList.add('bg-blue-600', 'text-white', 'font-semibold');
+            }
+        }
+
+        // ALL 12 CARDS COMPLETE DATA STRUCTURE
+        const CARDS_DATA = [
+            {
+                id: 1,
+                name: "Responsibility 責任",
+                tagline: "對自己的行為、他人與環境所承擔的義務與後果",
+                def: "個體在意識到自身的行為與決策對自我、他人及周遭環境產生的影響後，願意主動做出適當選擇並承擔相應後果的態度與行為能力。",
+                studentDef: "我知道我的選擇和做的事情會影響我自己和大家，所以我會用心做好該做的事，並且對結果負責！",
+                teacherExp: "『責任』並非單純要求學生『聽話或遵守規則』，而是透過引導讓學生理解『選擇與後果之間的因果連結』，進而培養自主管理與公共關懷能力。",
+                lifeExamples: ["每天記得帶齊上課用品與功課", "班級值日生認真完成掃地工作", "看到垃圾主動撿起來丟回收桶", "玩完玩具或用完教具主動歸位"],
+                misconceptions: "迷思：聽話、被動遵守規則就是負責任？修正：真正的責任源於自我選擇與價值認同，而非僅僅是因為害怕被懲罰才順從。",
+                bigIdeas: {
+                    low: [
+                        "我能照顧好自己的物品，也能幫助維持環境整潔。",
+                        "做選擇時思考一下，就能避免傷害自己或別人。",
+                        "答應別人的事情認真做到，能讓大家更信任我。",
+                        "當我做錯事時，勇於承認並努力改進就是負責任。",
+                        "分享與輪流使用公物，是班級每一位成員的責任。"
+                    ],
+                    mid: [
+                        "個人的日常生活抉擇，會直接或間接影響社區與環境。",
+                        "享受團體權益時，也需要相應承擔維護團體的義務。",
+                        "負責任的行為能建立人與人之間的信任與良好合作關係。",
+                        "數位世界的言論與行為同樣需要承擔道德與法律責任。",
+                        "關懷弱勢與保護自然資源，是公民對地球與社會的責任。"
+                    ],
+                    high: [
+                        "公民責任涵蓋對在地社區與全球議題的長期承諾與實踐。",
+                        "科技發展賦予人類強大能力，也帶來相應的倫理與監督責任。",
+                        "面對歷史或社會爭議議題，理解多元觀點是負責任公民的表現。",
+                        "永續發展要求現代人為未來的世代承擔資源合理分配的責任。",
+                        "個人價值觀驅動道德抉擇，引導個人在複雜情境中展現責任感。"
+                    ]
+                },
+                questions: {
+                    low: {
+                        factual: ["你的書包裡有哪些每天需要自己整理的物品？", "班級裡有哪些掃地區域需要大家共同負責？"],
+                        conceptual: ["為什麼如果大家都隨手丟垃圾，教室會變成什麼樣子？", "什麼叫做『對自己的行為負責』？"],
+                        debatable: ["如果好朋友做錯事，替他隱心算是好的朋友責任嗎？", "班規應該由老師訂定，還是大家一起討論訂定？"]
+                    },
+                    mid: {
+                        factual: ["我們每天產生多少塑膠垃圾？這些垃圾去了哪裡？", "學校與家裡有哪些明確的規定與安全守則？"],
+                        conceptual: ["個人消費習慣（如使用一次性餐具）如何影響生態環境？", "權利與責任之間有什麼不可分割的關係？"],
+                        debatable: ["為了便利性使用塑膠袋，與為了環境減塑，哪一個比較重要？", "網路發言只要匿名就可以不用負責任嗎？"]
+                    },
+                    high: {
+                        factual: ["什麼是『數位足跡 (Digital Footprint)』？它會留存多久？", "聯合國 SDGs 永續目標中第 12 項『負責任的消費與生產』包含哪些指標？"],
+                        conceptual: ["全球化生產鏈中，先進國家的消費者對開發中國家的勞工環境負有何種責任？", "個人行動如何透過群體串聯發揮改變社會的影響力？"],
+                        debatable: ["政府應該強制規定全民垃圾分類，還是靠自由意志？", "企業追求獲利與承擔社會責任 (CSR) 哪一個應優先考慮？"]
+                    }
+                },
+                curricular: {
+                    "🇬🇧 英語文": "Food Waste Reduction, Healthy Eating Habits, Community Helpers and Roles.",
+                    "🇹🇼 國語文": "閱讀導讀《小王子》責任篇章、議論文寫作『我是小小公民』。",
+                    "🌍 社會領域": "家鄉環境保護與垃圾處理、地方政府與公民參與。",
+                    "🔬 自然科學": "生態系平衡與人類活動衝擊、外來種對在地生態的影響。",
+                    "🎨 藝術領域": "減塑海報視覺設計、環境保護議題劇場表演。",
+                    "💻 資訊科技": "數位公民網路素養、個人資訊安全與網路霸凌防制。",
+                    "🏃 體育與健康": "運動精神與團隊守則、個人健康生活習慣自主檢核。",
+                    "🤝 綜合/生活": "班級自主公約訂定、校園綠色生活減碳實踐企劃。"
+                },
+                assessments: [
+                    { type: "🔍 形成性評量 (Formative)", items: ["個人每日責任與班級分工自我檢核表", "數位公民網路行為道德檢核清單", "探究過程討論態度觀察紀錄"] },
+                    { type: "🎯 總結性評量 (Summative)", items: ["倡議海報/短片設計評量規準 (Rubric)", "減塑與惜食行動企劃成果發表評分規準", "學習歷程檔案與質性心得報告"] },
+                    { type: "🤝 自評與同儕互評 (Self & Peer)", items: ["小組合作責任參與度紅黃綠燈自我評估", "同儕團體合作貢獻度質性評語與感謝卡", "自主責任承諾卡"] }
+                ],
+                sdgs: [
+                    { num: 12, name: "負責任的消費與生產", rating: "★★★★★", reason: "直接對應每日消費選擇與資源浪費責任。" },
+                    { num: 13, name: "氣候行動", rating: "★★★★☆", reason: "探討個人與國家面對氣候變遷應負之責任。" },
+                    { num: 16, name: "和平正義與健全制度", rating: "★★★☆☆", reason: "連結公民責任、法治與公平正義。" }
+                ]
+            },
+            {
+                id: 2,
+                name: "Interdependence 相互依存",
+                tagline: "系統內各要素之間互相連結、影響與依賴的關係",
+                def: "不同生物、群體、系統或自然要素之間存在著密不可分的聯繫，任何一部分的變化都會對整體造成漣漪效應。",
+                studentDef: "世界上沒有人可以單獨生活，我們和動植物、天氣還有社區裡的人都互相需要、互相幫忙！",
+                teacherExp: "著重於引導學生建立『系統思考 (Systems Thinking)』，理解人與自然、人與社會、國家與全球之間交織的網絡關係。",
+                lifeExamples: ["蜂鳥採蜜幫助花朵傳粉", "農夫種菜、司機運送、廚師烹飪讓大家吃到午餐", "學校裡不同職責的老師與職員維持校園運作"],
+                misconceptions: "迷思：相互依存就是『互相幫忙』而已？修正：除了互相合作外，更包含系統中若某一環節斷裂會引發整體崩潰的因果危機。",
+                bigIdeas: {
+                    low: [
+                        "生物之間互相需要才能在自然界中生存。",
+                        "社區裡的各種職業幫手共同維持大家的生活品質。",
+                        "班級裡每個人都有獨特功用，合作能完成更大目標。",
+                        "我們吃的食物和使用的物品都來自於大自然與許多人的辛苦。",
+                        "當我們照顧好環境，自然界也會給我們美好的回饋。"
+                    ],
+                    mid: [
+                        "生態系統中微小的改變，可能引發全系統的連鎖反應。",
+                        "全球貿易連結了不同國家的人們與商品資源。",
+                        "人與社會的相互依存需要透過合作與規範來維持平衡。",
+                        "氣候與自然資源的變化會影響人類經濟與生存品質。",
+                        "跨領域與多元文化團隊的互補能創造更完善的解決方案。"
+                    ],
+                    high: [
+                        "全球化社會中，某一地區的危機可能引發全球性的系統風險。",
+                        "生物多樣性是維持地球生態系統韌性與相互依存的基礎。",
+                        "技術、經濟與環境系統交織影響著人類永續發展。",
+                        "破解複雜全球議題需要跨國界與跨領域的協同合作。",
+                        "人類文明與自然圈處於動態動態平衡，無視依存將招致災難。"
+                    ]
+                },
+                questions: {
+                    low: {
+                        factual: ["蜜蜂在花朵之間飛來飛去是在做什麼？", "社區裡有哪些幫忙我們生活的人？"],
+                        conceptual: ["如果世界上所有的蜜蜂都消失了，會發生什麼事？", "為什麼我們不能一個人單獨生活在森林裡？"],
+                        debatable: ["我們應該自己種植所有的食物，還是向農夫購買比較好？", "在小組合作中，大家都做一樣的事比較好，還是做不同的事？"]
+                    },
+                    mid: {
+                        factual: ["什麼是『食物網 (Food Web)』？", "台灣進口了哪些外國的石油或糧食？"],
+                        conceptual: ["當一個地區的樹木被大量砍伐，會如何影響當地的土壤、河流與天氣？", "全球供應鏈中，一個國家的工廠停工會對其他國家造成什麼影響？"],
+                        debatable: ["保護稀有野生動物與開發地方經濟，哪一個更重要？", "我們應該多買在地食材，還是買外國進口的優質食材？"]
+                    },
+                    high: {
+                        factual: ["什麼是『碳循環 (Carbon Cycle)』與『生態平衡』？", "國際貿易如何連結世界各國的經濟？"],
+                        conceptual: ["極地冰川融化如何引發全球海平面上升與極端氣候？", "經濟發展與環境保護之間如何達成相互依存的平衡？"],
+                        debatable: ["面對全球流行傳染病，國家應該關閉邊境還是開放合作？", "先進國家是否應該為開發中國家的碳排放提供經濟補償？"]
+                    }
+                },
+                curricular: {
+                    "🇬🇧 英語文": "Global Trade Routes, Animal Food Chains, Community Helpers around the World.",
+                    "🇹🇼 國語文": "說明文閱讀《大自然的網絡》、繪本導讀《如果蜜蜂消失了》。",
+                    "🌍 社會領域": "家鄉產業合作鏈、臺灣與國際貿易關係與夥伴關係。",
+                    "🔬 自然科學": "食物鏈與食物網、池塘生態系與棲地維護。",
+                    "🎨 藝術領域": "集體創作校園壁畫、生態系統互動裝置藝術。",
+                    "💻 資訊科技": "IoT 物聯網設備協同運作原理、Scratch 生態食物網模擬遊戲。",
+                    "🏃 體育與健康": "團體合作運動與接力賽賽事設計、包容性體育活動。",
+                    "🤝 綜合/生活": "社區互助網絡調查、農夫市集與在地食材體驗企劃。"
+                },
+                assessments: [
+                    { type: "🔍 形成性評量 (Formative)", items: ["食物網或全球供應鏈心智圖繪製", "社區幫手互助網絡關係圖", "課堂小組分工檢核"] },
+                    { type: "🎯 總結性評量 (Summative)", items: ["跨領域 Podcasting 廣播展演", "生態平衡破壞後果分析簡報", "全球化商品供應鏈追蹤研究專題"] },
+                    { type: "🤝 自評與同儕互評 (Self & Peer)", items: ["組員互助同儕評估", "夥伴感謝卡發表", "系統思考學習單自評"] }
+                ],
+                sdgs: [
+                    { num: 15, name: "陸域生態", rating: "★★★★★", reason: "維繫生物多樣性與食物鏈的相互依存。" },
+                    { num: 17, name: "多元夥伴關係", rating: "★★★★★", reason: "展現全球跨國合作與相互依賴。" },
+                    { num: 11, name: "永續城鄉", rating: "★★★★☆", reason: "社區系統各要素互相支援協同運作。" }
+                ]
+            },
+            {
+                id: 3,
+                name: "Perspective 觀點",
+                tagline: "個人或群體因背景、立場或經驗不同所產生的多元理解方式",
+                def: "個體或群體因其身處之文化背景、生命經驗、利益立場或觀察角度之差異，對同一事件、現象或議題所形成的獨特解讀與價值評判。",
+                studentDef: "每個人就像戴著不同顏色的眼鏡看世界，看到的景色會不太一樣，沒有絕對的對與錯，需要學會換位思考。",
+                teacherExp: "重點在於區分『客觀事實 (Fact)』與『主觀觀點 (Perspective)』，引導學生走出自我中心，理解立場衝突背後的成因並培養同理心。",
+                lifeExamples: ["盲人摸象的故事", "興建捷運對在地店家（怕過渡期無生意）與通勤族（期待方便）的不同感受", "看棒球比賽不同隊球迷的心情"],
+                misconceptions: "迷思：觀點不同就代表有人在說謊或做錯？修正：事實是客觀存在的，但每個人基於自身經驗與立場產生的『觀點』是多元且應被理解的。",
+                bigIdeas: {
+                    low: ["站在不同角度看事情，會發現大家看到的可能不一樣。", "傾聽別人的看法，能幫助我們把事情看得更清楚。", "尊重和自己不一樣的想法，能讓大家相處更融洽。"],
+                    mid: ["個人的生長背景與經驗會形塑對事物的觀點。", "理解多元觀點有助於破解偏見並促進團隊合作。", "新聞與媒體訊息往往帶有創作者特定觀點。"],
+                    high: ["衝突的產生往往源於不同利益相關者觀點的對立。", "具備批判思考能力能幫助我們釐清事實與觀點的界線。", "全球議題需要透過跨文化的對話與觀點包容來尋求共識。"]
+                },
+                questions: {
+                    low: {
+                        factual: ["圖片中的小貓看起來是在笑還是害怕？", "為什麼同一台玩具大家想玩的方式不一樣？"],
+                        conceptual: ["為什麼站在城堡前面和後面拍出來的照片不一樣？", "什麼叫做『換位思考』？"],
+                        debatable: ["學校應該規定所有人穿一樣的校服，還是可以自由穿著？", "故事裡的狼一定是壞人嗎？"]
+                    },
+                    mid: {
+                        factual: ["新聞報導報導同一件事時，標題有什麼不同？", "家鄉興建快速道路有哪些團體支持或反對？"],
+                        conceptual: ["利益立場如何影響一個人對公共政策的看法？", "事實 (Fact) 與觀點 (Opinion) 有何本質上的不同？"],
+                        debatable: ["為了開發觀光帶動經濟而改變自然景觀是值得的嗎？", "歷史故事中的人物有絕對的好人與壞人嗎？"]
+                    },
+                    high: {
+                        factual: ["全球不同國家對於碳排放標準有哪些主張？", "什麼是媒體偏見 (Media Bias)？"],
+                        conceptual: ["歷史事件如何因敘事者觀點不同而產生截然不同的記載？", "文化視角如何影響人們對人權與禮儀的定義？"],
+                        debatable: ["在維護公共衛生與保障個人自由之間該如何取捨？", "國際國際紛爭中，是否可能存在完全中立的觀點？"]
+                    }
+                },
+                curricular: {
+                    "🇬🇧 英語文": "Comparing Cultural Festivals, Character Point of View in Fairy Tales.",
+                    "🇹🇼 國語文": "議論文閱讀、從不同角色視角重寫經典童話故事。",
+                    "🌍 社會領域": "家鄉建設公聽會模擬、歷史事件的多方觀點探討。",
+                    "🔬 自然科學": "科學史上不同理論演進（如地心說與日心說）、環境開發爭議。",
+                    "🎨 藝術領域": "透視法視覺藝術創作、立體派多角度繪畫賞析。",
+                    "💻 資訊科技": "演算法推薦系統與『資訊同溫層 (Filter Bubble)』判讀。",
+                    "🏃 體育與健康": "運動裁判判決角度討論、團隊賽事戰術多角評估。",
+                    "🤝 綜合/生活": "角色扮演心理情境劇、同理心卡牌對話體驗。"
+                },
+                assessments: [
+                    { type: "🔍 形成性評量 (Formative)", items: ["事實與觀點二分法學習單", "多方利益關係人立場分析圖"] },
+                    { type: "🎯 總結性評量 (Summative)", items: ["模擬公聽會角色扮演評分規準", "跨立場議題議論文撰寫"] },
+                    { type: "🤝 自評與同儕互評 (Self & Peer)", items: ["換位思考同理心自評表", "辯論發言傾聽同儕評估"] }
+                ],
+                sdgs: [
+                    { num: 16, name: "和平正義與健全制度", rating: "★★★★★", reason: "對話與觀點包容是達成和解與正義的核心。" },
+                    { num: 10, name: "減少不平等", rating: "★★★★☆", reason: "理解少數族群視角有助於消除偏見。" }
+                ]
+            },
+            {
+                id: 4,
+                name: "Culture 文化",
+                tagline: "特定群體世代傳承的生活方式、價值信仰與藝術符號之總和",
+                def: "特定社會或群體在歷史發展過程中所創造並共同遵循的信念、價值觀、風俗習慣、語言、藝術及符號體系之累積與傳承。",
+                studentDef: "文化就像是一個大家的特別生活故事庫，包含了我們吃的食物、過的節日、說的話和創作的藝術。",
+                teacherExp: "避免將文化簡化為表面化的『美食與節慶介紹』，應引導學生探究文化符號背後所蘊含的哲學價值、歷史脈絡與群體認同。",
+                lifeExamples: ["端午節包粽子與划龍舟", "台灣原住民豐富的祭典與織布圖騰", "不同國家吃東西用筷子、刀叉或手抓食的習慣"],
+                misconceptions: "迷思：文化是固定不變且傳統古老的東西？修正：文化是活的，會隨著時間推移、交流與創新而不斷演變。",
+                bigIdeas: {
+                    low: ["每一個群體都有自己特別的文化與生活習慣。", "透過節慶與故事，我們可以認識不同的文化。", "尊重不同的文化習慣，能讓我們交到更多朋友。"],
+                    mid: ["文化反映了人們適應在地自然環境與歷史的方式。", "藝術、語言與飲食是文化價值的具體展現。", "文化交流能豐富我們的生活經驗與美感視野。"],
+                    high: ["文化認同影響著人們的世界觀與道德評判標準。", "全球化浪潮下，文化保存與創新同樣重要。", "跨文化溝通需要對文化差異具備敏感度與包容心。"]
+                },
+                questions: {
+                    low: {
+                        factual: ["過年時你們家有什麼特別的習俗？", "世界各地有哪些不同的招呼方式？"],
+                        conceptual: ["為什麼不同地方的人會吃不同的主食？", "文化圖騰背後通常代表什麼意義？"],
+                        debatable: ["傳統的文化習俗如果造成不便，我們應該繼續保留嗎？", "外來飲食取代在地傳統食物是好還是壞？"]
+                    },
+                    mid: {
+                        factual: ["台灣原住民各族群的衣飾圖騰有哪些特徵？", "不同宗教慶典有什麼禁止或鼓勵的行為？"],
+                        conceptual: ["氣候與地理環境如何形塑當地的建築與服飾文化？", "故事與傳說如何代代相傳並傳播文化價值？"],
+                        debatable: ["觀光業發展對在地傳統文化的保存是幫助還是破壞？", "校園是否應該為了適應多元文化而調整飲食或作息？"]
+                    },
+                    high: {
+                        factual: ["聯合國教科文組織 (UNESCO) 認定無形文化資產的標準為何？", "什麼是『文化帝國主義』與『文化融合』？"],
+                        conceptual: ["語言的消逝對一個族群的文化傳承會造成什麼打擊？", "全球化如何重塑青年世代的文化認同？"],
+                        debatable: ["當傳統文化習俗與現代人權價值衝突時，該如何衡量？", "商業商業化利用傳統文化圖騰算不算是『文化挪用 (Cultural Appropriation)』？"]
+                    }
+                },
+                curricular: {
+                    "🇬🇧 英語文": "World Festivals, Cultural Storytelling, Traditional Costumes.",
+                    "🇹🇼 國語文": "神話與民間故事賞析、各族群文學作品導讀。",
+                    "🌍 社會領域": "家鄉傳統慶典調查、臺灣多元族群文化發展史。",
+                    "🔬 自然科學": "原住民族傳統生態知識 (TEK) 與自然相處之道。",
+                    "🎨 藝術領域": "傳統紋樣版畫創作、傳統樂器體驗與音樂賞析。",
+                    "💻 資訊科技": "數位文化典藏博物館導覽、AR 擴增實境文化遺產展示。",
+                    "🏃 體育與健康": "各國傳統體育遊戲（如竹竿舞、相撲）、傳統養生運動。",
+                    "🤝 綜合/生活": "異國美食文化體驗企劃、校園多元文化日活動。"
+                },
+                assessments: [
+                    { type: "🔍 形成性評量 (Formative)", items: ["文化要素冰山圖紀錄", "在地慶典田野調查筆記"] },
+                    { type: "🎯 總結性評量 (Summative)", items: ["多元文化展覽微型策展 Rubric", "文化繪本創作成果發表"] },
+                    { type: "🤝 自評與同儕互評 (Self & Peer)", items: ["跨文化尊重態度自我檢核表", "文化展覽同儕觀摩學習單"] }
+                ],
+                sdgs: [
+                    { num: 11, name: "永續城鄉", rating: "★★★★★", reason: "保護與捍衛世界文化與自然遺產。" },
+                    { num: 4, name: "優質教育", rating: "★★★★☆", reason: "促進多元文化理解與全球公民意識。" }
+                ]
+            },
+            {
+                id: 5,
+                name: "Diversity 多樣性",
+                tagline: "系統或社會中存在的多種不同類型、個體或觀點的豐富狀態",
+                def: "在一個特定生態、社會或群體系統中，個體在生物特徵、文化背景、能力性格、思想觀點等維度上所展現出的異質性與豐富程度。",
+                studentDef: "世界就像一個大花園，裡面有各種顏色、形狀的花草，因為大家都不一樣，世界才這麼精彩豐富。",
+                teacherExp: "強調『多樣性是強大與韌性的來源』，而非混亂的開端。引導學生超越對差異的恐懼，學會欣賞異質性所帶來的創造力。",
+                lifeExamples: ["森林裡有各種樹木、昆蟲與鳥類", "班上同學有的人擅長畫畫、有的人擅長跑步", "台灣夜市裡豐富多元的特色小吃"],
+                misconceptions: "迷思：大家思想與行為都一模一樣比較容易管理、比較好？修正：單一化會降低系統應對危機的能力，多樣性才能帶來創新與永續。",
+                bigIdeas: {
+                    low: ["每一個人都是獨一無二的，有自己的優點與特色。", "不同品種的花草樹木，讓大自然看起來更美好。", "學會和與自己不同的人相處，可以學到新事物。"],
+                    mid: ["生物多樣性是維持生態平衡與健康的重要關鍵。", "多元的背景與觀點能激發團隊產生更有創意的想法。", "包容多元特質能建立更具支持性的班級與社區環境。"],
+                    high: ["基因多樣性增強了物種抵禦疾病與環境變遷的能力。", "社會多樣性促進民主對話與文化創新。", "消除歧視與偏見是實現多樣性價值的先決條件。"]
+                },
+                questions: {
+                    low: {
+                        factual: ["我們班上有哪些同學有不一樣的專長或興趣？", "花園裡可以看到哪些不同形狀的樹葉？"],
+                        conceptual: ["如果世界上所有人都長得一模一樣、喜歡一樣的東西會怎樣？", "什麼叫做『獨一無二』？"],
+                        debatable: ["選班長時應該選跟自己最像的人，還是專長不一樣的人？", "學校應該只提供一種大家都喜歡的午餐嗎？"]
+                    },
+                    mid: {
+                        factual: ["池塘生態系裡有哪些不同的生物？", "台灣社會包含了哪些不同的族群與語言？"],
+                        conceptual: ["為什麼生物多樣性越高的森林越不容易被病蟲害摧毀？", "多樣性的團隊在解決問題時有什麼優勢？"],
+                        debatable: ["為了管理方便而要求團體服從統一規範是合理的嗎？", "外來物種增加了生物數量，算不算增加了好的多樣性？"]
+                    },
+                    high: {
+                        factual: ["全球野生動植物物種減少的速度為何？", "什麼是『神經多樣性 (Neurodiversity)』？"],
+                        conceptual: ["基因單一化對全球糧食安全（如單一農作物栽種）帶來何種風險？", "制度與法規如何保障少數族群的多樣性權利？"],
+                        debatable: ["保護瀕危語言與推廣全球通用語言之間該如何平衡？", "企業在徵才時是否應該設定多樣性配額 (Diversity Quotas)？"]
+                    }
+                },
+                curricular: {
+                    "🇬🇧 英語文": "Unique Qualities, Animal Species & Habitats, Diverse Families.",
+                    "🇹🇼 國語文": "描寫人物特質寫作、多元族群繪本導讀。",
+                    "🌍 社會領域": "台灣多元族群融合歷史、世界地理與不同生活型態。",
+                    "🔬 自然科學": "生物多樣性調查、基因與物種適應環境演化。",
+                    "🎨 藝術領域": "多元媒材拼貼畫創作、世界傳統音樂多樣性體驗。",
+                    "💻 資訊科技": "演算法偏見分析、無障礙網頁多樣性需求設計。",
+                    "🏃 體育與健康": "多元體適能適應運動、個體身體發展差異理解。",
+                    "🤝 綜合/生活": "『我們的獨特之處』班級策展、特教宣導體驗。"
+                },
+                assessments: [
+                    { type: "🔍 形成性評量 (Formative)", items: ["校園生物多樣性踩點調查表", "個人特質萬花筒心智圖"] },
+                    { type: "🎯 總結性評量 (Summative)", items: ["生物多樣性危機研究報告 Rubric", "包容多樣性倡議短片發表"] },
+                    { type: "🤝 自評與同儕互評 (Self & Peer)", items: ["同儕特質欣賞卡寫作", "團隊多元優點互評表"] }
+                ],
+                sdgs: [
+                    { num: 15, name: "陸域生態", rating: "★★★★★", reason: "保護與維持生物多樣性是核心目標。" },
+                    { num: 10, name: "減少不平等", rating: "★★★★☆", reason: "接納並包容社會多元族群差異。" }
+                ]
+            },
+            {
+                id: 6,
+                name: "Equity 公平",
+                tagline: "考量個體差異與需求，提供相應支持以實現實質機會平等",
+                def: "考量個體因起點、能力、資源或環境所產生之差異與障礙，給予適當且差異化的支持與調整，以確保所有人皆能平等獲得參與及成功的機會。",
+                studentDef: "公平不是給每個人一模一樣的東西，而是根據每個人的需要給予幫助，讓大家都能順利參加和學習。",
+                teacherExp: "務必澄清『Equality (給予相同資源/平均)』與『Equity (依需求給予適當支持/公平)』的差異，建立包容與無障礙的同理心。",
+                lifeExamples: ["矮個子小朋友踩高腳凳才能看到牆外的棒球比賽", "輪椅使用者需要斜坡而不是階梯", "適應體育修改比賽規則讓視障生也能打球"],
+                misconceptions: "迷思：給每個人一模一樣的東西才是公平（齊頭式平等）？修正：起點不同時，給予相同資源反而會擴大差距，真正的公平需要適度調適與支持。",
+                bigIdeas: {
+                    low: ["當有人需要幫助時，給他適當的支持是公平的表現。", "班級裡的規則與教具應該讓每個人都能順利使用。", "懂得關心同學的需求，能建立溫暖公平的班級。"],
+                    mid: ["公平要求我們辨識並消除阻礙人們參與的屏障。", "齊頭式的給予不等於公平，因材施教才能展現公平。", "提供公平的資源能讓不同背景的人都有發揮潛能的機會。"],
+                    high: ["社會制度應致力於消除結構性的不平等與偏見。", "追求實質公平需要促進社會資源的合理再分配。", "全球範疇的公平涵蓋性別、經濟與世代之間的正義。"]
+                },
+                questions: {
+                    low: {
+                        factual: ["教室裡有哪些設施幫助了身體不方便的同學？", "為什麼玩遊戲時年紀小的弟弟妹妹可以優先跳一步？"],
+                        conceptual: ["給每個人一模一樣的鞋子穿算不算是公平？為什麼？", "什麼叫做『實質的公平』？"],
+                        debatable: ["考試時給閱讀有困難的同學更多時間是公平的嗎？", "比賽時應該所有人用一樣的規則，還是可以為特別狀況調整？"]
+                    },
+                    mid: {
+                        factual: ["什麼是『無障礙空間 (Universal Design)』？", "偏遠地區學校獲得哪些額外的教育資源補助？"],
+                        conceptual: ["『齊頭式平等 (Equality)』與『實質公平 (Equity)』有何不同？", "社會如何透過制度調整來幫助弱勢族群？"],
+                        debatable: ["為了照顧少數族群而預留名額，對其他人公平嗎？", "全民繳一樣的稅金還是富人多繳稅比較公平？"]
+                    },
+                    high: {
+                        factual: ["聯合國 SDGs 第 5 項與第 10 項的具體指標有哪些？", "什麼是『疫苗公平分配 (Vaccine Equity)』？"],
+                        conceptual: ["歷史遺留下來的歧視如何影響現代社會的經濟公平？", "科技近用權（數位落差）如何威脅機會公平？"],
+                        debatable: ["氣候變遷責任中，發達國家是否應負擔更多減碳經濟補償？", "性別配額制度 (Gender Quotas) 是否為實現公平的最佳途徑？"]
+                    }
+                },
+                curricular: {
+                    "🇬🇧 英語文": "Fairness and Rules, Special Needs and Support, Accessibility around Us.",
+                    "🇹🇼 國語文": "同理心繪本閱讀、社會議題辯論文章導讀。",
+                    "🌍 社會領域": "家鄉無障礙環境調查、臺灣社會福利制度與人權保障。",
+                    "🔬 自然科學": "通用設計 (Universal Design) 原理與輔具科學。",
+                    "🎨 藝術領域": "無障礙藝術展演企劃、公平議題倡議海報創作。",
+                    "💻 資訊科技": "數位平權與偏鄉科技落差解決方案設計。",
+                    "🏃 體育與健康": "適應體育 (Adaptive PE) 賽事設計與輪椅運動體驗。",
+                    "🤝 綜合/生活": "校園無障礙體檢企劃、特教宣導體驗關卡。"
+                },
+                assessments: [
+                    { type: "🔍 形成性評量 (Formative)", items: ["校園無障礙設施觀察紀錄表", "齊頭平等vs實質公平案例分辨單"] },
+                    { type: "🎯 總結性評量 (Summative)", items: ["包容性通用設計企劃簡報 Rubric", "無障礙體育關卡設計發表"] },
+                    { type: "🤝 自評與同儕互評 (Self & Peer)", items: ["包容同理心態度自評量表", "關卡體驗回饋感謝卡"] }
+                ],
+                sdgs: [
+                    { num: 10, name: "減少不平等", rating: "★★★★★", reason: "公平的核心在於消除阻礙與減少不平等。" },
+                    { num: 5, name: "性別平等", rating: "★★★★★", reason: "追求性別實質權益與機會公平。" }
+                ]
+            },
+            {
+                id: 7,
+                name: "Identity 認同",
+                tagline: "個體對自我特質、歸屬群體與價值的認知與定位",
+                def: "個體對自我身分、特質、信念、文化背景及在社會結構與群體中歸屬感之動態認知與自我定義過程。",
+                studentDef: "認同就是認識我自己的特別之處，知道自己喜歡什麼、從哪裡來，並為這樣的自己感到驕傲。",
+                teacherExp: "引導學生進行深度的自我探索，理解『認同』是多元且動態發展的（包含個人認同、文化認同與全球公民認同），並尊重他人獨立個性。",
+                lifeExamples: ["介紹自己的名字由來與故事", "自信地向大家分享家庭的傳統飲食", "在球隊中擔任隊長並體會自己的角色責任"],
+                misconceptions: "迷思：認同是固定不變的標籤或只有單一屬性？修正：每個人同時擁有多重認同（如既是臺灣人也是全球公民），且會隨著成長經驗而發展。",
+                bigIdeas: {
+                    low: ["探索自己的興趣與專長，能幫助我更認識自己。", "每個人都有屬於自己的名字與特別的故事。", "接納自己的樣子，也能勇敢展現自己的優點。"],
+                    mid: ["我們的家庭、文化與成長環境形塑了我們的身分認同。", "個體可以在不同的社群中擁有多重的角色與認同。", "了解自我價值能幫助我們建立自信與抗壓能力。"],
+                    high: ["數位時代下，個人在虛擬與真實世界中建立不同的身分認同。", "本土文化認同與全球公民認同可以相互包容並存。", "克服社會刻板印象是建立自主自我認同的重要過程。"]
+                },
+                questions: {
+                    low: {
+                        factual: ["你的名字是誰幫你取的？有什麼特別的意思？", "你最喜歡自己的哪一個優點或興趣？"],
+                        conceptual: ["是什麼讓『你』成為獨一無二的你？", "什麼叫做『為自己感到驕傲』？"],
+                        debatable: ["我們應該為了讓大家喜歡自己而改變自己的興趣嗎？", "男生一定要喜歡藍色、女生一定要喜歡粉紅色嗎？"]
+                    },
+                    mid: {
+                        factual: ["你的家鄉或族群有什麼特別的故事？", "我們在學校、家庭與社團中分別扮演什麼角色？"],
+                        conceptual: ["我們的文化背景如何影響我們對自我的看法？", "同儕壓力如何影響個人的自主認同？"],
+                        debatable: ["一個人可以同時屬於多個不同的文化群體嗎？", "穿著特定品牌衣服能代表一個人的真實身分嗎？"]
+                    },
+                    high: {
+                        factual: ["什麼是『數位身分 (Digital Identity)』與『網路小號』？", "憲法如何保障個人的身分權與自由？"],
+                        conceptual: ["全球化如何衝擊或重塑傳統的在地文化認同？", "自我認同與社會期望發生衝突時該如何調適？"],
+                        debatable: ["在社群媒體上記錄完美形象算不算是真實的自我認同？", "地方本土意識與全球公民意識會產生矛盾嗎？"]
+                    }
+                },
+                curricular: {
+                    "🇬🇧 英語文": "All About Me, Family Heritage, Personal Interests.",
+                    "🇹🇼 國語文": "自傳與自我探索寫作、生命故事繪本導讀。",
+                    "🌍 社會領域": "家鄉尋根歷史、尋找台灣在世界的位置與自我的連結。",
+                    "🔬 自然科學": "人體基因與遺傳特徵、獨一無二指紋與DNA科學。",
+                    "🎨 藝術領域": "自畫像視覺創作、生命故事箱 (Memory Box) 製作。",
+                    "💻 資訊科技": "數位足跡與網路個人形象管理、個人主題網站建置。",
+                    "🏃 體育與健康": "個人身體意象 (Body Image) 正向建立、運動員精神與角色認同。",
+                    "🤝 綜合/生活": "『我是誰』特質探索市集、尋根成長檔案製作。"
+                },
+                assessments: [
+                    { type: "🔍 形成性評量 (Formative)", items: ["個人特質與多重角色心智圖", "數位足跡自我檢視清單"] },
+                    { type: "🎯 總結性評量 (Summative)", items: ["『生命故事箱』成果發表 Rubric", "個人數位歷程檔案 Showcase"] },
+                    { type: "🤝 自評與同儕互評 (Self & Peer)", items: ["自尊與自信自我評估表", "同儕優點欣賞回饋卡"] }
+                ],
+                sdgs: [
+                    { num: 16, name: "和平正義與健全制度", rating: "★★★★★", reason: "保障所有人擁有合法的身分認同。" },
+                    { num: 3, name: "良好健康與福祉", rating: "★★★★☆", reason: "健全的自我認同有助於心理健康與福祉。" }
+                ]
+            },
+            {
+                id: 8,
+                name: "Sustainability 永續",
+                tagline: "在滿足當前需求的同時，確保未來世代與地球的和諧發展",
+                def: "在滿足當代人類需求與發展的同時，不損害未來世代滿足其需求之能力，追求環境保護、經濟繁榮與社會公平之間的動態平衡。",
+                studentDef: "永續就是愛惜現在的資源，使用東西時要考慮未來，讓後代的小朋友也能擁有美好的地球。",
+                teacherExp: "超越單純的『做回收與節能』，引導學生從『系統循環』與『世代間的正義倫理』角度，省思個人日常消費對全球環境的深遠影響。",
+                lifeExamples: ["出門自備環保杯與購物袋", "修理壞掉的腳踏車而不是直接買新的", "利用雨水回收系統來澆灌校園花草"],
+                misconceptions: "迷思：永續只是環保志工或政府的事情，跟小朋友無關？修正：永續涵蓋日常生活中的每一次消費抉擇與生活型態，每個人都是行動的主角。",
+                bigIdeas: {
+                    low: ["珍惜身邊的資源不浪費，能讓地球更健康。", "重複使用物品與回收，是愛護地球的好方法。", "照顧校園裡的植物與小動物，能促進永續環境。"],
+                    mid: ["資源是有限的，循環使用能減緩地球資源耗竭。", "個人的消費選擇能推動企業進行綠色轉型。", "綠色能源與創新科技有助於降低環境負擔。"],
+                    high: ["永續要求環境生態、經濟發展與社會公平三者平衡。", "氣候變遷威脅全球永續，需要跨國連動的系統解決方案。", "現代人的生活型態承擔著對未來世代的倫理與正義責任。"]
+                },
+                questions: {
+                    low: {
+                        factual: ["我們每天在學校會用到哪些天然資源？", "回收桶裡的寶特瓶可以被做成什麼新東西？"],
+                        conceptual: ["為什麼如果我們把水用光了，後面的小朋友就會沒水用？", "什麼叫做『重複使用 (Reuse)』？"],
+                        debatable: ["一次性塑膠餐具很方便，我們應該完全禁止使用嗎？", "學校應該花錢裝設太陽能板嗎？"]
+                    },
+                    mid: {
+                        factual: ["什麼是『碳足跡 (Carbon Footprint)』與『循環經濟』？", "臺灣的主要發電來源有哪些？"],
+                        conceptual: ["過度消費如何驅動資源採掘並破壞棲地生態？", "在地食材（縮短食物里程）如何促進環境永續？"],
+                        debatable: ["為了保護環境而限制地方經濟發展是合理的嗎？", "買價格較高但耐用的綠色商品，還是便宜的消耗品比較好？"]
+                    },
+                    high: {
+                        factual: ["聯合國 17 項 SDGs 永續發展目標的歷史由來為何？", "什麼是『零碳排放 (Net Zero)』？"],
+                        conceptual: ["氣候變遷如何加劇全球貧富差距與糧食危機？", "企業『洗綠 (Greenwashing)』行為如何損害真正的永續推動？"],
+                        debatable: ["發達國家是否應對氣候受災的開發中國家提供補償？", "科技創新還是改變人類生活型態才是實現永續的主力？"]
+                    }
+                },
+                curricular: {
+                    "🇬🇧 英語文": "Eco-friendly Habits, Renewable Energy, Saving Planet Earth.",
+                    "🇹🇼 國語文": "環境報導文學導讀、減塑倡議演說稿撰寫。",
+                    "🌍 社會領域": "臺灣資源開發歷史、全球氣候變遷與綠色產業轉型。",
+                    "🔬 自然科學": "再生能源（風力/太陽能）實驗、再生塑膠材質探究。",
+                    "🎨 藝術領域": "廢棄物再生藝術 (Upcycled Art) 創作、永續時尚展設計。",
+                    "💻 資訊科技": "Micro:bit 智慧校園節能監測系統程式設計。",
+                    "🏃 體育與健康": "無痕山林 (Leave No Trace) 戶外教育、環境健康與永續飲食。",
+                    "🤝 綜合/生活": "校園減碳大挑戰企劃、二手綠色市集籌辦。"
+                },
+                assessments: [
+                    { type: "🔍 形成性評量 (Formative)", items: ["個人與家庭碳足跡計算表", "校園能源浪費觀察紀錄"] },
+                    { type: "🎯 總結性評量 (Summative)", items: ["校園永續綠色轉型提案 Rubric", "廢棄物再創藝術品展演"] },
+                    { type: "🤝 自評與同儕互評 (Self & Peer)", items: ["日常減碳習慣自主檢核表", "綠色行動夥伴互相監督卡"] }
+                ],
+                sdgs: [
+                    { num: 12, name: "負責任的消費與生產", rating: "★★★★★", reason: "永續的核心在於負責任地運用資源。" },
+                    { num: 13, name: "氣候行動", rating: "★★★★★", reason: "對抗氣候變遷是永續發展的當務之急。" },
+                    { num: 11, name: "永續城鄉", rating: "★★★★☆", reason: "建立綠色永續的居住社區。" }
+                ]
+            },
+            {
+                id: 9,
+                name: "Change 改變",
+                tagline: "事物隨著時間推移或受力量作用所產生的轉變與演進",
+                def: "事物在時間軸的演進過程或特定驅動力的作用下，其狀態、型態、性質、結構或關係所發生的轉換與重塑。",
+                studentDef: "改變就是事物變得和以前不一樣了，有些改變是自然的成長，有些改變需要我們主動發起。",
+                teacherExp: "引導學生理解『改變是萬物的常態』，並探究改變背後的『原因與結果 (Cause and Effect)』，培養面對變動的調適力與發起積極改變的行動力。",
+                lifeExamples: ["四季更替導致樹葉變色落葉", "從低年級長高到高年級的身體變化", "智慧型手機的發明徹底改變了人們的溝通方式"],
+                misconceptions: "迷思：改變總是不好的、令人害怕的？修正：改變是萬物運行的規律，它帶來挑戰，但也帶來成長與創新的契機。",
+                bigIdeas: {
+                    low: ["時間會帶給我們和周遭環境很多有趣的改變。", "我們可以透過學習，讓自己變得越來越棒。", "小小的正向改變，能累積成美好的大結果。"],
+                    mid: ["改變有其原因，並會對系統帶來多方面的結果。", "面對環境的改變，適應與調適能力至關重要。", "人類的發明與行動能顯著加速社會與自然的改變。"],
+                    high: ["改變可以是漸進的，也可以是顛覆性的巨變。", "理解歷史的改變軌跡有助於我們預測與規劃未來。", "主動發起改變需要遠見、勇氣與持續的群體倡議。"]
+                },
+                questions: {
+                    low: {
+                        factual: ["從一年級到現在，你的身體發生了哪些改變？", "毛毛蟲是怎麼改變變成美麗的蝴蝶？"],
+                        conceptual: ["為什麼有些改變很慢，有些改變卻很快？", "什麼叫做『正向的改變』？"],
+                        debatable: ["學校改變規定（如延後上學）是好還是壞？", "如果可以選擇，你希望生活永遠不要改變嗎？"]
+                    },
+                    mid: {
+                        factual: ["家鄉在地圖與照片中近五十年發生了哪些改變？", "水加熱或冷卻後會發生什麼狀態改變？"],
+                        conceptual: ["科技改變了我們的生活，帶來了哪些好處與副作用？", "氣候變遷如何改變全球動物的遷徙習慣？"],
+                        debatable: ["改變傳統生活習慣來適應科技發展是必然的嗎？", "自然發生的改變與人類造成的改變哪一個影響更深遠？"]
+                    },
+                    high: {
+                        factual: ["工業革命如何改變了人類社會的結構與環境？", "極端氣候如何改變全球的海陸輪廓？"],
+                        conceptual: ["『漸進式改變』與『顛覆式改變』在社會發展上有何不同？", "個人如何克服對改變的恐懼並引導團隊轉型？"],
+                        debatable: ["為了追求經濟社會進步，破壞舊有歷史文化改變市容值得嗎？", "AI 技術引爆的改變對人類未來是利大於弊嗎？"]
+                    }
+                },
+                curricular: {
+                    "🇬🇧 英語文": "Past and Present, Life Cycles, Changing Seasons.",
+                    "🇹🇼 國語文": "時間與成長主題文學賞析、記敘文『我的改變之旅』。",
+                    "🌍 社會領域": "家鄉土地利用變遷史、臺灣社會民主化變革。",
+                    "🔬 自然科學": "物質狀態變化實驗、生物演化與環境適應。",
+                    "🎨 藝術領域": "漸變美感視覺藝術創作、定格動畫 (Stop-Motion) 變革視覺表達。",
+                    "💻 資訊科技": "科技演進歷史探究、資訊系統更新與迭代概念。",
+                    "🏃 體育與健康": "青春期生理與心理改變調適、體適能進步紀錄。",
+                    "🤝 綜合/生活": "『微小改變大不同』校園行動企劃、個人成長檔案歷程展。"
+                },
+                assessments: [
+                    { type: "🔍 Formative", items: ["事物改變前後因果對比圖", "成長變化時間軸 (Timeline) 表"] },
+                    { type: "🎯 Summative", items: ["家鄉變遷主題研究簡報 Rubric", "正向改變微行動成果展"] },
+                    { type: "🤝 Self & Peer", items: ["面對改變適應力自我反思表", "成長改變同儕互卡"] }
+                ],
+                sdgs: [
+                    { num: 13, name: "氣候行動", rating: "★★★★★", reason: "因應與減緩全球氣候變遷系統。" },
+                    { num: 9, name: "產業創新與基礎建設", rating: "★★★★☆", reason: "透過轉型帶來可持續的結構改變。" }
+                ]
+            },
+            {
+                id: 10,
+                name: "Innovation 創新",
+                tagline: "運用創造性思考，提出新想法或方法以突破限制、解決問題",
+                def: "結合批判性與創造性思考，重新組合現有要素或研發全新技術、方法與觀點，以更有效率、更有價值或更具永續性的方式解決現實問題。",
+                studentDef: "創新就是動動腦筋，想出新的方法或做出一種新的發明，讓生活變得更方便、問題更容易被解決。",
+                teacherExp: "強調『創新不限於高科技發明』，更包含思維轉變、流程優化與跨領域的創意組合，引導學生具備 Maker 創客解決問題的精神。",
+                lifeExamples: ["將寶特瓶改良成自動給水花盆", "用 Micro:bit 設計感測器自動提醒關燈", "發明有趣的桌遊讓大家邊玩邊學垃圾分類"],
+                misconceptions: "迷思：只有天才或科學家才能做創新？修正：只要願意用新角度觀察日常生活中的不便並嘗試改善，人人都能展現創新。",
+                bigIdeas: {
+                    low: ["用創意想出新方法，能幫我們解決生活中的小不便。", "把不同的東西組合在一起，可能會產生神奇的新功能。", "失敗是創新的好幫手，能讓我們學到更好的方法。"],
+                    mid: ["創新源於對周遭問題的好奇心與同理心。", "科技與設計的創新能提升人類的生活品質。", "團隊合作能結合不同點子，激發出更有創意的解決方案。"],
+                    high: ["社會創新能打破傳統限制，解決複雜的公共議題。", "負責任的創新需要同時評估科技對倫理與環境的長遠影響。", "創新思考包含『破壞性創新』與對舊有思維的勇敢挑戰。"]
+                },
+                questions: {
+                    low: {
+                        factual: ["教室裡有哪些物品是為了讓人更方便而發明的？", "你曾用廢棄材料做過什麼有新功能的東西？"],
+                        conceptual: ["什麼叫做『有創意的點子』？", "為什麼想出新方法時遇到失敗沒關係？"],
+                        debatable: ["買最新發明的玩具，還是自己動手做新玩具比較好？", "所有的創新發明都能帶來好結果嗎？"]
+                    },
+                    mid: {
+                        factual: ["歷史上有哪些發明改變了人類的交通或溝通？", "什麼是『設計思考 (Design Thinking)』？"],
+                        conceptual: ["如何透過同理心發現使用者未被滿足的需求並進行創新？", "失敗與試錯在創新過程中扮演什麼角色？"],
+                        debatable: ["為了創新而廢除傳統作法一定是好的嗎？", "專利制度保護了創作者，會不會阻礙了別人的創新？"]
+                    },
+                    high: {
+                        factual: ["什麼是『社會創新 (Social Innovation)』與『破壞性創新』？", "生成式 AI (Generative AI) 如何改變當前的創新模式？"],
+                        conceptual: ["創新如何促進資源的高效利用並推動永續發展？", "倫理道德應該如何約束科技創新的邊界？"],
+                        debatable: ["科技創新是否會加劇社會貧富落差？", "我們應該優先投資於解決當前問題，還是追求顛覆未來的創新？"]
+                    }
+                },
+                curricular: {
+                    "🇬🇧 英語文": "Inventors and Inventions, Creative Problem Solving, Future Schools.",
+                    "🇹🇼 國語文": "創客發明故事導讀、說明文『我的創意新發明』。",
+                    "🌍 社會領域": "臺灣工業與科技創新史、社會企業與公益創新案例。",
+                    "🔬 自然科學": "仿生學 (Biomimicry) 應用實驗、機構設計與力學創新。",
+                    "🎨 藝術領域": "創意複合媒材雕塑、Maker 創客美感產品設計。",
+                    "💻 資訊科技": "Scratch 互動遊戲開發、Micro:bit 智慧創客原型製作。",
+                    "🏃 體育與健康": "創新趣味體育遊戲規則設計、健康科技裝置應用。",
+                    "🤝 綜合/生活": "校園生活不便改善提案發表會、創客市集。"
+                },
+                assessments: [
+                    { type: "🔍 Formative", items: ["設計思考 (Design Thinking) 五步驟發想單", "創新原型測試紀錄表"] },
+                    { type: "🎯 Summative", items: ["創客作品原型發表會 Rubric", "創新問題解決提案計畫書"] },
+                    { type: "🤝 Self & Peer", items: ["創造力與試錯勇氣自評表", "創客作品同儕回饋點子卡"] }
+                ],
+                sdgs: [
+                    { num: 9, name: "產業創新與基礎建設", rating: "★★★★★", reason: "鼓勵創新研發與永續基礎建設。" },
+                    { num: 8, name: "體面工作與經濟成長", rating: "★★★★☆", reason: "創新驅動高價值經濟成長與就業。" }
+                ]
+            },
+            {
+                id: 11,
+                name: "Communication 溝通",
+                tagline: "運用多種媒介進行訊息、觀點與情感的相互表達與理解",
+                def: "個體或群體之間運用語言、文字、符號、肢體動作、視覺圖像或數位媒介，進行資訊、意圖、觀點與情感的雙向傳遞、詮釋與達成共識的過程。",
+                studentDef: "溝通不只是我說你聽，而是認真表達自己的看法，同時也用心的傾聽別人，大家互相明白對方的意思。",
+                teacherExp: "強調『雙向傾聽』與『同理心』，引導學生掌握多元媒介（口語、視覺藝術、數位媒體）的表達技巧與跨文化溝通的敏感度。",
+                lifeExamples: ["小組討論時輪流發言並認真記筆記", "用視覺資訊圖表 (Infographic) 讓大家一眼看懂倡議內容", "跨國筆友寫信交流各自的文化與生活"],
+                misconceptions: "迷思：講話聲音很大、講很多話就是溝通能力好？修正：溝通的重點在於『訊息精準傳達』與『達成雙向理解』，傾聽往往比表達更重要。",
+                bigIdeas: {
+                    low: ["清楚地說出自己的想法，並專心聽別人說話是良好的溝通。", "除了說話，表情、動作和圖畫也能幫我們表達意思。", "禮貌的溝通能避免誤會，讓大家感情更好。"],
+                    mid: ["選擇適當的媒介與語言，能讓訊息傳遞得更有效率。", "傾聽與同理心是解決衝突與建立共識的關鍵溝通技能。", "數位媒體提供了多元的溝通管道，但也需要注意禮儀與真實性。"],
+                    high: ["跨文化溝通需要理解不同文化背景下的溝通風格與隱喻。", "非暴力溝通 (NVC) 能促進深層對話並化解結構性對立。", "大眾媒體與社群網路重朔了現代社會的公共溝通與輿論形成。"]
+                },
+                questions: {
+                    low: {
+                        factual: ["除了用嘴巴說話，我們還可以用哪些方式告訴別人訊息？", "當同學說話時，眼睛看著他是代表什麼？"],
+                        conceptual: ["為什麼有時候我們沒有惡意，別人卻會誤會我們的意思？", "什麼叫做『專心傾聽』？"],
+                        debatable: ["生氣的時候應該立刻說出來，還是先冷靜一下再說？", "用通訊軟體傳訊息比面對面講話好嗎？"]
+                    },
+                    mid: {
+                        factual: ["標誌 (Icons) 與符號如何不透過文字傳達安全訊息？", "一次成功的小組討論包含哪些步驟？"],
+                        conceptual: ["『聽懂』與『聽到』有何差別？同理心如何提升溝通品質？", "視覺視覺圖表與文字相比有何溝通優勢？"],
+                        debatable: ["在社群網路上使用表情符號 (Emoji) 算是正式的溝通嗎？", "為了避免衝突而選擇沉默，是好還是壞的溝通策略？"]
+                    },
+                    high: {
+                        factual: ["什麼是『非暴力溝通 (Nonviolent Communication)』四大要素？", "什麼是『跨文化溝通障礙』？"],
+                        conceptual: ["演算法如何透過訊息篩選影響現代人的政治溝通與立場？", "如何運用敘事 (Storytelling) 技巧提升倡議行動的影響力？"],
+                        debatable: ["完全言論自由是否應該包含爭議性或令人不悅的溝通？", "AI 翻譯工具能完全替代人類的跨文化溝通嗎？"]
+                    }
+                },
+                curricular: {
+                    "🇬🇧 英語文": "Interviews, Presentation Skills, Email and Letter Writing.",
+                    "🇹🇼 國語文": "口語演說、非暴力溝通對話練習、新聞採訪寫作。",
+                    "🌍 社會領域": "地方公聽會對話模擬、大眾媒體與公共輿論傳播歷史。",
+                    "🔬 自然科學": "動物的溝通方式（蜜蜂舞蹈/鯨魚鳴叫）、科學數據圖表呈現。",
+                    "🎨 藝術領域": "視覺符號海報設計、肢體劇場非語言溝通表達。",
+                    "💻 資訊科技": "Podcasting 播客錄音製作、簡報視覺化溝通設計。",
+                    "🏃 體育與健康": "球隊戰術手勢溝通、情緒表達與人際溝通溝通技巧。",
+                    "🤝 綜合/生活": "校園新聞播報台企劃、同儕衝突調解志工 training。"
+                },
+                assessments: [
+                    { type: "🔍 Formative", items: ["小組傾聽與發言次數檢核表", "訊息圖表表達準確度單"] },
+                    { type: "🎯 Summative", items: ["Podcasting 訪談節目發表 Rubric", "跨文化溝通簡報展演"] },
+                    { type: "🤝 Self & Peer", items: ["傾聽同理心態度自我量表", "簡報溝通效果同儕點評卡"] }
+                ],
+                sdgs: [
+                    { num: 17, name: "多元夥伴關係", rating: "★★★★★", reason: "溝通是建立夥伴關係與對話的基石。" },
+                    { num: 16, name: "和平正義與健全制度", rating: "★★★★☆", reason: "透明包容的溝通促進社會和平。" }
+                ]
+            },
+            {
+                id: 12,
+                name: "Action 行動",
+                tagline: "將學習、關懷與思辨轉化為改善自我、社區與全球的具體實踐",
+                def: "個體或群體基於深刻的探究理解、道德價值與社會關懷，將理念轉化為有目標、有組織且具自主性的實際實踐，以創造積極正面改變的過程。",
+                studentDef: "行動就是不只在嘴巴上說或心裡想，而是真正伸出雙手去做，讓世界因為我們而變得更好一點點！",
+                teacherExp: "強調『學生自主主導 (Student Agency)』，行動的形式多元（包含自我微小習慣改變、倡議分享、服務學習與公共參與），重點在於知行合一。",
+                lifeExamples: ["在學校確實執行午餐廚餘減量", "繪製校園減塑地圖並向全校宣導", "為動物保護團體舉辦義賣活動"],
+                misconceptions: "迷思：行動一定要是驚天動地的大革命或大規模活動？修正：身邊微小的生活習慣改變、向身邊的人傳遞關懷，都是極具價值的行動。",
+                bigIdeas: {
+                    low: ["伸出雙手幫忙身邊的人，就是最棒的行動。", "從小小的良好習慣做起，我們都能讓學校變得更好。", "當我們關心世界時，就能勇敢做出改變的行動。"],
+                    mid: ["有計畫的團體行動能產生比個人更大的影響力。", "行動源於深入的觀察、探究與對問題的關懷。", "透過倡議與分享，能鼓勵更多人加入我們的行動。"],
+                    high: ["公民行動是實現社會正義與環境永續的重要驅動力。", "永續的行動需要持續的評估、反思與跨界合作。", "全球公民具備將在地行動與全球目標 (SDGs) 連結的能力。"]
+                },
+                questions: {
+                    low: {
+                        factual: ["今天你在學校做了哪一件幫助別人的事情？", "看到同學跌倒時，你可以採取什麼行動？"],
+                        conceptual: ["為什麼光是用想的還不夠，需要真正『動手做』？", "什麼叫做『正向的行動』？"],
+                        debatable: ["小朋友年紀還小，也能做出改變世界的行動嗎？", "幫忙撿垃圾如果沒有人看到，還值得做嗎？"]
+                    },
+                    mid: {
+                        factual: ["我們學校過去舉辦過哪些社會服務或倡議行動？", "發起一項校園行動包含哪些企劃步驟？"],
+                        conceptual: ["『個人行動』與『集體倡議』在影響力上有何不同？", "同理心如何驅動一個人採取勇敢的行動？"],
+                        debatable: ["如果行動可能會遇到失敗或反對，我們還應該嘗試嗎？", "行動應該以解決當前小問題為主，還是發起大變革？"]
+                    },
+                    high: {
+                        factual: ["歷史上有哪些著名的少年公民發起全球行動（如馬拉拉、瑞典氣候少女）？", "什麼是『服務學習 (Service Learning)』？"],
+                        conceptual: ["如何評估一項倡議行動所產生的真實社會影響力？", "學生自主性 (Student Agency) 在行動中扮演何種核心角色？"],
+                        debatable: ["公民不服從 (Civil Disobedience) 行動在道德上是合理的嗎？", "社群媒體上的『按讚點擊 (Slacktivism)』算不算是有效的行動？"]
+                    }
+                },
+                curricular: {
+                    "🇬🇧 英語文": "Campaign Speeches, Letters to the Principal, Public Advocacy.",
+                    "🇹🇼 國語文": "倡議文與連署書撰寫、演講稿寫作與展演。",
+                    "🌍 社會領域": "社區志工服務企劃、公民參與與公共議題倡議行動。",
+                    "🔬 自然科學": "校園生物棲地營造行動、水資源節約實踐實驗。",
+                    "🎨 藝術領域": "快閃壁畫創作倡議、公共議題倡議快閃劇展演。",
+                    "💻 資訊科技": "倡議主題網站架設、線上連署與資訊懶人包發布。",
+                    "🏃 體育與健康": "健康生活習慣挑戰賽、包容性體育賽事籌辦執行。",
+                    "🤝 綜合/生活": "校園減塑倡議大遊行、跳蚤市場義賣與捐贈專案。"
+                },
+                assessments: [
+                    { type: "🔍 Formative", items: ["行動企劃甘特圖與分工表", "行動過程困難紀錄與修正單"] },
+                    { type: "🎯 Summative", items: ["行動影響力成果發表展 Rubric", "服務學習歷程紀錄檔案"] },
+                    { type: "🤝 Self & Peer", items: ["自主行動影響力自我評估表", "團隊行動貢獻度夥伴互評卡"] }
+                ],
+                sdgs: [
+                    { num: 17, name: "多元夥伴關係", rating: "★★★★★", reason: "結合眾人力量付諸行動。" },
+                    { num: 13, name: "氣候行動", rating: "★★★★★", reason: "積極採取氣候救援行動。" }
+                ]
+            }
+        ];
+
+        // EXEMPLARS DATA (Grades 3, 5, 6)
+        const EXEMPLARS = [
+            {
+                grade: "三年級",
+                domain: "🇬🇧 英語文 / 雙語",
+                concept: "Responsibility 責任",
+                topic: "Healthy Eating & Food Waste (健康飲食與減少剩食)",
+                bigIdea: "個人的日常飲食選擇不僅影響自我健康，也承擔著全球食物資源分配的責任。",
+                inquiry: "1. What foods are good for our body?\n2. How does food waste happen in school?\n3. Why is reducing food waste our responsibility?",
+                activities: "學生透過英文繪本《Oliver's Vegetables》認識健康食材，並記錄一週午餐廚餘量，練習以英文句型『I can eat healthier by...』表達改善計畫。",
+                task: "雙語倡議海報與午餐廣播 (Bilingual Poster & Lunchtime Podcast Announcement)",
+                assessment: "1. 形成性：食物卡片單字分類與廚餘記錄單。\n2. 總結性：雙語海報設計 Rubric (語言表達 40%、宣導內容 40%、美感 20%)。"
+            },
+            {
+                grade: "三年級",
+                domain: "🎨 藝術領域",
+                concept: "Culture 文化",
+                topic: "圖騰與在地文化記憶",
+                bigIdea: "藝術符號是文化價值的具象載體，展現群體對自我身份的認同與傳承。",
+                inquiry: "1. 台灣原住民圖騰有哪些常見幾何形狀？\n2. 圖騰背後代表了什麼傳說或信仰？\n3. 我們如何用現代藝術傳承在地文化？",
+                activities: "實地踏查校園或社區傳統建築，觀察傳統紋樣，學習剪紙與印花技術，創作屬於自己家族的文化圖騰。",
+                task: "社區文化紋樣展覽與微型導覽 (Community Pattern Exhibition)",
+                assessment: "1. 形成性：紋樣觀察採集學習單。\n2. 總結性：版畫圖騰作品與口頭導覽解說評分規準。"
+            },
+            {
+                grade: "五年級",
+                domain: "💻 資訊科技",
+                concept: "Innovation 創新",
+                topic: "Micro:bit 智慧校園節能裝置",
+                bigIdea: "運用創新科技解決日常生活中的資源浪費，能促進人與環境的永續共生。",
+                inquiry: "1. 教室裡有哪些電器容易被忘記關閉？\n2. 光敏與溫濕度感測器如何協助自動化控制？\n3. 科技能完全替代人類的省電習慣嗎？",
+                activities: "學習 Micro:bit 積木程式，設計感測教室光線自動提醒關燈的裝置，並在班級進行為期兩週的實測與電力數據分析。",
+                task: "創客節能裝置原型發布會 (Smart Green Campus Device Prototype Showcase)",
+                assessment: "1. 形成性：程式邏輯除錯紀錄與感測數據表。\n2. 總結性：裝置原型簡報發表與測試成果 Rubric。"
+            },
+            {
+                grade: "五年級",
+                domain: "🏃 體育與健康",
+                concept: "Equity 公平",
+                topic: "適應體育與包容性運動會",
+                bigIdea: "真正的公平不是給每個人相同的待遇，而是調整規則以去除障礙，讓所有人都能參與。",
+                inquiry: "1. 身心障礙者在進行體育運動時會遇到哪些屏障？\n2. 帕運 (Paralympics) 項目如何修改規則以維護公平？\n3. 我們可以如何設計人人都能同樂的體育關卡？",
+                activities: "體驗坐姿排球與蒙眼盲人滾球，討論規則對不同身體條件者的影響，小組設計一關『無障礙趣味運動關卡』並邀請全校體驗。",
+                task: "校園包容性運動會關卡設計企劃與現場展演 (Inclusive Sports Station Design)",
+                assessment: "1. 形成性：體驗運動反思札記與規則修改討論單。\n2. 總結性：關卡設計合理性與體驗者回饋滿意度規準。"
+            },
+            {
+                grade: "六年級",
+                domain: "🌍 社會領域",
+                concept: "Perspective 觀點",
+                topic: "家鄉交通建設公聽會模擬",
+                bigIdea: "不同的利益相關者對同一公共建設擁有不同觀點，決策需在多元需求中尋照平衡。",
+                inquiry: "1. 興建捷運或快速道路對商家、居民與環境有何利弊？\n2. 事實 (Fact) 與立場觀點 (Perspective) 有何差別？\n3. 如何透過民主對話達成共識？",
+                activities: "分組扮演居民、商家、環保團體與政府代表，搜集真實新聞案例數據，撰寫公聽會發言稿並進行角色的模擬辯論與協商。",
+                task: "模擬公聽會辯論與決策建議書 (Town Hall Debate & Public Policy Proposal)",
+                assessment: "1. 形成性：立場分析比較表與新聞資料判讀。\n2. 總結性：辯論表達與換位思考同理心指標評分規準。"
+            }
+        ];
+
+        // Render Concept Buttons
+        function renderCardSelector() {
+            const container = document.getElementById('card-selector');
+            if (!container) return;
+            container.innerHTML = CARDS_DATA.map(card => `
+                <button onclick="selectCard(${card.id})" id="card-btn-${card.id}" 
+                    class="card-select-btn p-3 rounded-xl border border-slate-200 hover:border-blue-500 hover:bg-blue-50 text-left transition flex flex-col justify-between ${card.id === currentCardId ? 'bg-blue-50 border-blue-600 ring-2 ring-blue-500/20' : 'bg-white'}">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-md">#${card.id}</span>
+                        <span class="text-xs text-slate-400">Concept</span>
+                    </div>
+                    <div class="font-bold text-slate-800 text-sm truncate">${card.name}</div>
+                </button>
+            `).join('');
+        }
+
+        // Select Card
+        function selectCard(cardId) {
+            currentCardId = cardId;
+            renderCardSelector();
+            renderCardContent(cardId);
+            switchCardSubTab(1);
+        }
+
+        // Render Card Detail Content
+        function renderCardContent(cardId) {
+            const card = CARDS_DATA.find(c => c.id === cardId);
+            if (!card) return;
+
+            document.getElementById('active-card-icon').innerText = `#${card.id}`;
+            document.getElementById('active-card-title').innerText = card.name;
+            document.getElementById('active-card-tag').innerText = `Concept #${card.id}`;
+            document.getElementById('active-card-sub').innerText = card.tagline;
+
+            // Page 1
+            document.getElementById('p1-def').innerText = card.def;
+            document.getElementById('p1-student').innerText = card.studentDef;
+            document.getElementById('p1-teacher').innerText = card.teacherExp;
+            document.getElementById('p1-misconception').innerText = card.misconceptions;
+
+            const p1Life = document.getElementById('p1-life');
+            if (p1Life) {
+                p1Life.innerHTML = card.lifeExamples.map(item => `<li>${item}</li>`).join('');
+            }
+
+            // Page 2 Big Ideas
+            const p2Container = document.getElementById('p2-bigideas-container');
+            if (p2Container) {
+                p2Container.innerHTML = `
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                        <span class="text-xs font-bold text-blue-700 bg-blue-100 px-2.5 py-0.5 rounded-md">🌱 低年級 (Lower Grades)</span>
+                        <div class="space-y-2 mt-2">
+                            ${card.bigIdeas.low.map((s) => `
+                                <label class="flex items-start gap-2 text-xs text-slate-700 cursor-pointer hover:text-blue-600">
+                                    <input type="checkbox" class="bigidea-checkbox mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500" value="${s}">
+                                    <span>${s}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                        <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-md">🌿 中年級 (Middle Grades)</span>
+                        <div class="space-y-2 mt-2">
+                            ${card.bigIdeas.mid.map((s) => `
+                                <label class="flex items-start gap-2 text-xs text-slate-700 cursor-pointer hover:text-blue-600">
+                                    <input type="checkbox" class="bigidea-checkbox mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500" value="${s}">
+                                    <span>${s}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                        <span class="text-xs font-bold text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-md">🌳 高年級 (Upper Grades)</span>
+                        <div class="space-y-2 mt-2">
+                            ${card.bigIdeas.high.map((s) => `
+                                <label class="flex items-start gap-2 text-xs text-slate-700 cursor-pointer hover:text-blue-600">
+                                    <input type="checkbox" class="bigidea-checkbox mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500" value="${s}">
+                                    <span>${s}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Page 3 Questions
+            const p3Container = document.getElementById('p3-questions-container');
+            if (p3Container) {
+                const renderQuestionCategory = (qObj) => {
+                    return `
+                        <div class="space-y-3">
+                            <div>
+                                <span class="text-[11px] font-bold text-blue-700 bg-blue-100/80 px-2 py-0.5 rounded">🔍 事實性問題 (Factual)</span>
+                                <div class="space-y-1.5 mt-1.5">
+                                    ${qObj.factual.map(q => `
+                                        <label class="flex items-start gap-2 text-xs text-slate-700 cursor-pointer hover:text-blue-600">
+                                            <input type="checkbox" class="question-checkbox mt-0.5 rounded border-slate-300 text-blue-600" value="[事實 Factual] ${q}">
+                                            <span>${q}</span>
+                                        </label>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <div>
+                                <span class="text-[11px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded">🧠 概念性問題 (Conceptual)</span>
+                                <div class="space-y-1.5 mt-1.5">
+                                    ${qObj.conceptual.map(q => `
+                                        <label class="flex items-start gap-2 text-xs text-slate-700 cursor-pointer hover:text-blue-600">
+                                            <input type="checkbox" class="question-checkbox mt-0.5 rounded border-slate-300 text-blue-600" value="[概念 Conceptual] ${q}">
+                                            <span>${q}</span>
+                                        </label>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <div>
+                                <span class="text-[11px] font-bold text-amber-800 bg-amber-100/80 px-2 py-0.5 rounded">⚖️ 辯論性問題 (Debatable)</span>
+                                <div class="space-y-1.5 mt-1.5">
+                                    ${qObj.debatable.map(q => `
+                                        <label class="flex items-start gap-2 text-xs text-slate-700 cursor-pointer hover:text-blue-600">
+                                            <input type="checkbox" class="question-checkbox mt-0.5 rounded border-slate-300 text-blue-600" value="[辯論 Debatable] ${q}">
+                                            <span>${q}</span>
+                                        </label>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                };
+
+                p3Container.innerHTML = `
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                        <span class="text-xs font-bold text-blue-800 bg-blue-100 px-2.5 py-1 rounded-md block w-fit">🌱 低年級提問 (Lower Grades)</span>
+                        ${renderQuestionCategory(card.questions.low)}
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                        <span class="text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-md block w-fit">🌿 中年級提問 (Middle Grades)</span>
+                        ${renderQuestionCategory(card.questions.mid)}
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                        <span class="text-xs font-bold text-purple-800 bg-purple-100 px-2.5 py-1 rounded-md block w-fit">🌳 高年級提問 (Upper Grades)</span>
+                        ${renderQuestionCategory(card.questions.high)}
+                    </div>
+                `;
+            }
+
+            // Page 4 Curricular
+            const p4Container = document.getElementById('p4-curricular-container');
+            if (p4Container) {
+                p4Container.innerHTML = Object.entries(card.curricular).map(([dom, text]) => `
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5 hover:border-blue-300 transition">
+                        <span class="text-xs font-bold text-blue-700 bg-blue-100/60 px-2 py-0.5 rounded inline-block mb-1">${dom}</span>
+                        <p class="text-xs text-slate-700 font-medium leading-relaxed">${text}</p>
+                    </div>
+                `).join('');
+            }
+
+            // Page 5 Tasks
+            const p5Tasks = document.getElementById('p5-tasks-container');
+            if (p5Tasks) {
+                const taskCategories = [
+                    { domain: "🇬🇧 英語 / 雙語領域", tasks: ["Poster (雙語倡議海報)", "Podcast (雙語廣播訪談)", "TED Talk (五分鐘英語演講)", "Storybook (雙語繪本)"] },
+                    { domain: "🌍 社會 / 公民領域", tasks: ["Community Action (社區倡議行動)", "Interview (採訪記錄)", "Town Hall Meeting (模擬公聽會)", "Museum Exhibition (策展)"] },
+                    { domain: "🎨 藝術 / 美感領域", tasks: ["Infographic (資訊圖表/懶人包)", "Upcycled Art (舊物改造展)", "Mural / Public Art (公共藝術)", "Animation (格拍動畫)"] },
+                    { domain: "💻 資訊 / 科技領域", tasks: ["Micro:bit Device (微型智慧裝置)", "Website / Blog (主題網站)", "Interactive Game (Scratch 遊戲)", "AI Portfolio (AI專題)"] },
+                    { domain: "🏃 體育 / 健康領域", tasks: ["Adaptive PE Station (包容性關卡)", "Inclusive Sports Event (賽事籌辦)", "Health Campaign (健康推廣)"] },
+                    { domain: "🤝 綜合 / 生活領域", tasks: ["Flea Market (二手市集)", "News Report (校園新聞播報)", "Memory Box (生命故事箱)"] }
+                ];
+
+                p5Tasks.innerHTML = taskCategories.map(cat => `
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
+                        <span class="text-xs font-bold text-blue-700 block border-b border-slate-200 pb-1.5">${cat.domain}</span>
+                        <div class="space-y-1.5">
+                            ${cat.tasks.map(t => `
+                                <label class="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer hover:text-blue-600">
+                                    <input type="checkbox" class="task-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500" value="${t}">
+                                    <span class="truncate">${t}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Page 5 Assessments
+            const p5Assessments = document.getElementById('p5-assessments-container');
+            if (p5Assessments && card.assessments) {
+                p5Assessments.innerHTML = card.assessments.map(group => `
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
+                        <span class="text-xs font-bold text-emerald-800 block border-b border-slate-200 pb-1.5">${group.type}</span>
+                        <div class="space-y-1.5">
+                            ${group.items.map(item => `
+                                <label class="flex items-start gap-2 text-xs font-medium text-slate-700 cursor-pointer hover:text-emerald-700">
+                                    <input type="checkbox" class="assessment-checkbox mt-0.5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" value="[${group.type}] ${item}">
+                                    <span class="leading-snug">${item}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Page 5 SDGs
+            const p5Sdgs = document.getElementById('p5-sdgs-container');
+            if (p5Sdgs && card.sdgs) {
+                p5Sdgs.innerHTML = card.sdgs.map(sdg => `
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2 hover:border-purple-300 transition">
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" class="sdg-checkbox rounded border-slate-300 text-purple-600 focus:ring-purple-500" value="SDG ${sdg.num} ${sdg.name} (${sdg.rating})">
+                                <span class="font-bold text-slate-800 text-xs">SDG ${sdg.num} ${sdg.name}</span>
+                            </label>
+                            <span class="text-xs font-bold text-amber-500">${sdg.rating}</span>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed font-medium pl-6">${sdg.reason}</p>
+                    </div>
+                `).join('');
+            }
+
+            if (window.lucide && lucide.createIcons) {
+                try { lucide.createIcons(); } catch(e) {}
+            }
+        }
+
+        // Render Exemplars in Part 4
+        function renderPart4Exemplars() {
+            const container = document.getElementById('exemplars-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            EXEMPLARS.forEach((ex, idx) => {
+                const card = document.createElement('div');
+                card.className = 'p-6 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col justify-between space-y-4 shadow-sm hover:shadow-md transition';
+                card.innerHTML = `
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800">${ex.grade}</span>
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">${ex.domain}</span>
+                            </div>
+                            <span class="text-xs font-semibold text-slate-500 bg-white px-2 py-1 rounded-md border border-slate-200">${ex.concept}</span>
+                        </div>
+                        
+                        <div>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">📌 主題 Topic</span>
+                            <h4 class="font-bold text-slate-800 text-base">${ex.topic}</h4>
+                        </div>
+
+                        <div>
+                            <span class="text-[10px] font-bold text-blue-500 uppercase tracking-wider block">💡 大概念 Big Idea</span>
+                            <p class="text-xs text-slate-700 font-medium leading-relaxed">${ex.bigIdea}</p>
+                        </div>
+
+                        <div class="bg-white p-3 rounded-xl border border-slate-200/80 space-y-1">
+                            <span class="text-[10px] font-bold text-amber-600 uppercase tracking-wider block">❓ 探究問題 Inquiry Questions</span>
+                            <p class="text-xs text-slate-600 font-medium whitespace-pre-line leading-relaxed">${ex.inquiry}</p>
+                        </div>
+
+                        <div class="bg-white p-3 rounded-xl border border-slate-200/80 space-y-1">
+                            <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider block">🏃 學習活動 Learning Activities</span>
+                            <p class="text-xs text-slate-600 font-medium whitespace-pre-line leading-relaxed">${ex.activities}</p>
+                        </div>
+
+                        <div class="bg-blue-50/80 p-3 rounded-xl border border-blue-100 space-y-1">
+                            <span class="text-[10px] font-bold text-blue-700 uppercase tracking-wider block">🎯 表現任務 Performance Task</span>
+                            <p class="text-xs text-blue-900 font-bold leading-relaxed">${ex.task}</p>
+                        </div>
+
+                        <div class="bg-purple-50/80 p-3 rounded-xl border border-purple-100 space-y-1">
+                            <span class="text-[10px] font-bold text-purple-700 uppercase tracking-wider block">📊 多元評量 Assessment</span>
+                            <p class="text-xs text-purple-900 font-medium whitespace-pre-line leading-relaxed">${ex.assessment}</p>
+                        </div>
+                    </div>
+                    <button onclick="applyExemplarToCanvas(${idx})" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-sm mt-4">
+                        <i data-lucide="download" class="w-4 h-4"></i> 套用此範例至 A3 畫布
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+            if (window.lucide && lucide.createIcons) {
+                try { lucide.createIcons(); } catch(e) {}
+            }
+        }
+
+        // Apply Exemplar to Canvas
+        function applyExemplarToCanvas(idx) {
+            const ex = EXEMPLARS[idx];
+            if (!ex) return;
+
+            if (document.getElementById('canvas-unit-title')) document.getElementById('canvas-unit-title').value = ex.topic;
+            if (document.getElementById('canvas-grade-domain')) document.getElementById('canvas-grade-domain').value = `${ex.grade} / ${ex.domain}`;
+            if (document.getElementById('canvas-c1')) document.getElementById('canvas-c1').value = ex.topic;
+            if (document.getElementById('canvas-c2')) document.getElementById('canvas-c2').value = ex.concept;
+            if (document.getElementById('canvas-c3')) document.getElementById('canvas-c3').value = ex.bigIdea;
+            if (document.getElementById('canvas-c4')) document.getElementById('canvas-c4').value = ex.inquiry;
+            if (document.getElementById('canvas-c5')) document.getElementById('canvas-c5').value = ex.activities;
+            if (document.getElementById('canvas-c6')) document.getElementById('canvas-c6').value = ex.task;
+            if (document.getElementById('canvas-c7')) document.getElementById('canvas-c7').value = ex.assessment;
+
+            showToast(`已成功套用「${ex.grade} ${ex.domain}」之完整教案範例至 A3 畫布！`);
+            switchTab('part3');
+        }
+
+        // Export Actions to Canvas
+        function exportSelectedBigIdeasToCanvas() {
+            const checked = Array.from(document.querySelectorAll('.bigidea-checkbox:checked')).map(cb => cb.value);
+            if (checked.length === 0) {
+                showToast("請先勾選至少一個大概念句型！");
+                return;
+            }
+            const canvasC3 = document.getElementById('canvas-c3');
+            if (canvasC3) {
+                const current = canvasC3.value ? canvasC3.value + "\n\n" : "";
+                canvasC3.value = current + checked.map(b => "• " + b).join("\n");
+            }
+            showToast("已成功匯出選定大概念至 PART 3 畫布！");
+            switchTab('part3');
+        }
+
+        function exportSelectedQuestionsToCanvas() {
+            const checked = Array.from(document.querySelectorAll('.question-checkbox:checked')).map(cb => cb.value);
+            if (checked.length === 0) {
+                showToast("請先勾選至少一個探究問題！");
+                return;
+            }
+            const canvasC4 = document.getElementById('canvas-c4');
+            if (canvasC4) {
+                const current = canvasC4.value ? canvasC4.value + "\n\n" : "";
+                canvasC4.value = current + checked.map(q => "• " + q).join("\n");
+            }
+            showToast("已成功匯出選定問題至 PART 3 畫布！");
+            switchTab('part3');
+        }
+
+        function exportSelectedTasksToCanvas() {
+            const checked = Array.from(document.querySelectorAll('.task-checkbox:checked')).map(cb => cb.value);
+            const customTask = document.getElementById('custom-task-input')?.value.trim();
+            if (customTask) {
+                checked.push(`自訂實作任務: ${customTask}`);
+            }
+            if (checked.length === 0) {
+                showToast("請先勾選至少一個實作任務或輸入自訂內容！");
+                return;
+            }
+            const canvasC6 = document.getElementById('canvas-c6');
+            if (canvasC6) {
+                const current = canvasC6.value ? canvasC6.value + "\n\n" : "";
+                canvasC6.value = current + checked.map(t => "• " + t).join("\n");
+            }
+            showToast("已成功匯出選定任務至 PART 3 畫布！");
+            switchTab('part3');
+        }
+
+        function exportSelectedAssessmentToCanvas() {
+            const checked = Array.from(document.querySelectorAll('.assessment-checkbox:checked')).map(cb => cb.value);
+            if (checked.length === 0) {
+                showToast("請先勾選至少一個多元評量建議項目！");
+                return;
+            }
+            const canvasC7 = document.getElementById('canvas-c7');
+            if (canvasC7) {
+                const current = canvasC7.value ? canvasC7.value + "\n\n" : "";
+                canvasC7.value = current + checked.map(a => "• " + a).join("\n");
+            }
+            showToast("已成功匯出選定評量策略至 PART 3 畫布 (步驟 7)！");
+            switchTab('part3');
+        }
+
+        function exportSelectedSDGsToCanvas() {
+            const checked = Array.from(document.querySelectorAll('.sdg-checkbox:checked')).map(cb => cb.value);
+            if (checked.length === 0) {
+                showToast("請先勾選至少一個 SDGs 目標！");
+                return;
+            }
+            const canvasC2 = document.getElementById('canvas-c2');
+            if (canvasC2) {
+                const current = canvasC2.value ? canvasC2.value + "\n\n" : "";
+                canvasC2.value = current + "搭配 SDGs 永續目標：\n" + checked.map(s => "• " + s).join("\n");
+            }
+            showToast("已將選定 SDGs 標註至 PART 3 畫布 (步驟 2)！");
+            switchTab('part3');
+        }
+
+        function exportReflectionToCanvas() {
+            const ev = document.getElementById('p6-evidence')?.value || '';
+            const hi = document.getElementById('p6-highlights')?.value || '';
+            const ref = document.getElementById('p6-teacher-ref')?.value || '';
+            const nxt = document.getElementById('p6-next')?.value || '';
+
+            const combined = `【學生理解證據】:\n${ev}\n\n【作品亮點】:\n${hi}\n\n【教師反思】:\n${ref}\n\n【下次調整】:\n${nxt}`;
+            const canvasC9 = document.getElementById('canvas-c9');
+            if (canvasC9) {
+                canvasC9.value = combined;
+            }
+            showToast("已成功將反思內容帶入 PART 3 畫布！");
+            switchTab('part3');
+        }
+
+        // Save & Load LocalStorage
+        function saveToLocalStorage() {
+            const data = {
+                unitTitle: document.getElementById('canvas-unit-title')?.value || '',
+                gradeDomain: document.getElementById('canvas-grade-domain')?.value || '',
+                teacherName: document.getElementById('canvas-teacher-name')?.value || '',
+                c1: document.getElementById('canvas-c1')?.value || '',
+                c2: document.getElementById('canvas-c2')?.value || '',
+                c3: document.getElementById('canvas-c3')?.value || '',
+                c4: document.getElementById('canvas-c4')?.value || '',
+                c5: document.getElementById('canvas-c5')?.value || '',
+                c6: document.getElementById('canvas-c6')?.value || '',
+                c7: document.getElementById('canvas-c7')?.value || '',
+                c8: document.getElementById('canvas-c8')?.value || '',
+                c9: document.getElementById('canvas-c9')?.value || ''
+            };
+            try {
+                localStorage.setItem('gtc_canvas_data', JSON.stringify(data));
+                showToast("內容已成功暫存於瀏覽器快取中！");
+            } catch (e) {
+                showToast("暫存失敗：您的瀏覽器可能禁用了 LocalStorage。");
+            }
+        }
+
+        function loadFromLocalStorage() {
+            try {
+                const saved = localStorage.getItem('gtc_canvas_data');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    if (data.unitTitle) document.getElementById('canvas-unit-title').value = data.unitTitle;
+                    if (data.gradeDomain) document.getElementById('canvas-grade-domain').value = data.gradeDomain;
+                    if (data.teacherName) document.getElementById('canvas-teacher-name').value = data.teacherName;
+                    if (data.c1) document.getElementById('canvas-c1').value = data.c1;
+                    if (data.c2) document.getElementById('canvas-c2').value = data.c2;
+                    if (data.c3) document.getElementById('canvas-c3').value = data.c3;
+                    if (data.c4) document.getElementById('canvas-c4').value = data.c4;
+                    if (data.c5) document.getElementById('canvas-c5').value = data.c5;
+                    if (data.c6) document.getElementById('canvas-c6').value = data.c6;
+                    if (data.c7) document.getElementById('canvas-c7').value = data.c7;
+                    if (data.c8) document.getElementById('canvas-c8').value = data.c8;
+                    if (data.c9) document.getElementById('canvas-c9').value = data.c9;
+                }
+            } catch(e) {}
+        }
+
+        // Export to Word
+        function exportToWord() {
+            const unitTitle = document.getElementById('canvas-unit-title')?.value || '未命名課程單元';
+            const gradeDomain = document.getElementById('canvas-grade-domain')?.value || '未填寫';
+            const teacherName = document.getElementById('canvas-teacher-name')?.value || '未填寫';
+
+            const c1 = document.getElementById('canvas-c1')?.value || '';
+            const c2 = document.getElementById('canvas-c2')?.value || '';
+            const c3 = document.getElementById('canvas-c3')?.value || '';
+            const c4 = document.getElementById('canvas-c4')?.value || '';
+            const c5 = document.getElementById('canvas-c5')?.value || '';
+            const c6 = document.getElementById('canvas-c6')?.value || '';
+            const c7 = document.getElementById('canvas-c7')?.value || '';
+            const c8 = document.getElementById('canvas-c8')?.value || '';
+            const c9 = document.getElementById('canvas-c9')?.value || '';
+
+            const wordContent = `
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                <head>
+                    <meta charset='utf-8'>
+                    <title>Global Thinking Cards 國際教育課程發想</title>
+                    <style>
+                        body { font-family: '微軟正黑體', 'Arial', sans-serif; line-height: 1.6; color: #333; }
+                        h1 { color: #1e3a8a; font-size: 22pt; text-align: center; margin-bottom: 5px; }
+                        .subtitle { text-align: center; color: #475569; font-size: 13pt; margin-bottom: 20px; font-weight: bold; }
+                        .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                        .meta-table td { padding: 8px; border: 1px solid #cbd5e1; background-color: #f8fafc; font-size: 10pt; }
+                        .content-table { width: 100%; border-collapse: collapse; }
+                        .content-table th { background-color: #2563eb; color: white; padding: 10px; font-size: 11pt; text-align: left; }
+                        .content-table td { padding: 10px; border: 1px solid #cbd5e1; vertical-align: top; font-size: 10pt; }
+                        .step-num { font-weight: bold; color: #1d4ed8; }
+                        .footer { margin-top: 30px; text-align: right; font-size: 9pt; color: #94a3b8; }
+                    </style>
+                </head>
+                <body>
+                    <h1>Global Thinking Cards 國際教育課程發想</h1>
+                    <div class="subtitle">Concept-Based International Curriculum Design Plan</div>
+
+                    <table class="meta-table">
+                        <tr>
+                            <td width="33%"><strong>單元名稱：</strong> ${unitTitle}</td>
+                            <td width="33%"><strong>適用年級/領域：</strong> ${gradeDomain}</td>
+                            <td width="33%"><strong>設計教師：</strong> ${teacherName}</td>
+                        </tr>
+                    </table>
+
+                    <table class="content-table">
+                        <thead>
+                            <tr>
+                                <th width="30%">課程設計步驟</th>
+                                <th width="70%">發想內容與設計細節</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="step-num">步驟 1</span><br><strong>Topic 主題</strong></td>
+                                <td>${c1.replace(/\n/g, '<br>')}</td>
+                            </tr>
+                            <tr>
+                                <td><span class="step-num">步驟 2</span><br><strong>Key Concept 核心概念</strong></td>
+                                <td>${c2.replace(/\n/g, '<br>')}</td>
+                            </tr>
+                            <tr>
+                                <td><span class="step-num">步驟 3</span><br><strong>Big Idea 大概念</strong></td>
+                                <td>${c3.replace(/\n/g, '<br>')}</td>
+                            </tr>
+                            <tr>
+                                <td><span class="step-num">步驟 4</span><br><strong>Inquiry Questions 探究問題</strong></td>
+                                <td>${c4.replace(/\n/g, '<br>')}</td>
+                            </tr>
+                            <tr>
+                                <td><span class="step-num">步驟 5</span><br><strong>Learning Experiences 學習體驗</strong></td>
+                                <td>${c5.replace(/\n/g, '<br>')}</td>
+                            </tr>
+                            <tr>
+                                <td><span class="step-num">步驟 6</span><br><strong>Performance Task 實作任務</strong></td>
+                                <td>${c6.replace(/\n/g, '<br>')}</td>
+                            </tr>
+                            <tr>
+                                <td><span class="step-num">步驟 7</span><br><strong>Assessment 評量</strong></td>
+                                <td>${c7.replace(/\n/g, '<br>')}</td>
+                            </tr>
+                            <tr>
+                                <td><span class="step-num">步驟 8</span><br><strong>Student Evidence 學習證據</strong></td>
+                                <td>${c8.replace(/\n/g, '<br>')}</td>
+                            </tr>
+                            <tr>
+                                <td><span class="step-num">步驟 9</span><br><strong>Reflection 教師反思</strong></td>
+                                <td>${c9.replace(/\n/g, '<br>')}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="footer">
+                        臺北市文昌國民小學 鍾靜宜老師 製作
+                    </div>
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob(['\ufeff', wordContent], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Global_Thinking_Cards_課程發想_${unitTitle}.doc`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast("Word 檔案已產出並自動開始下載！");
+        }
+
+        function printPDF() {
+            window.print();
+        }
+
+        // Initialize Application on Window Load
+        window.onload = function() {
+            renderCardSelector();
+            renderCardContent(currentCardId);
+            renderPart4Exemplars();
+            loadFromLocalStorage();
+
+            if (window.lucide && lucide.createIcons) {
+                try { lucide.createIcons(); } catch (e) {}
+            }
+        };
+    </script>
+</body>
+</html>
